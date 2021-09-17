@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "604163387047",
+    "project_id": "flutter-assignme",
+    "storage_bucket": "flutter-assignme.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:604163387047:android:edfd0097c66359de93b582",
+        "android_client_info": {
+          "package_name": "com.example.flutter_assignme"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "604163387047-j5jvmv20rapa47mdp6hn0dmgqcmgmfpa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDTidV0Val5ZbxH89gojjg0aCH66OsZpU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "604163387047-j5jvmv20rapa47mdp6hn0dmgqcmgmfpa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

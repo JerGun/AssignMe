@@ -1,0 +1,134 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_assignme/screens/components/submit_button.dart';
+import 'package:flutter_assignme/screens/sign_up/sign_up_screen.dart';
+import 'package:flutter_assignme/services/authentication_service.dart';
+import 'package:provider/provider.dart';
+
+import '../components/behavior.dart';
+import '../components/text_input.dart';
+
+class SignInScreen extends StatelessWidget {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: ScrollConfiguration(
+        behavior: Behavior(),
+        child: SingleChildScrollView(
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            color: Colors.grey[850],
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height * 0.125,
+                          bottom: MediaQuery.of(context).size.height * 0.075),
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(left: 10),
+                          child: Text(
+                            'Login',
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Padding(
+                          padding: EdgeInsets.only(left: 10),
+                          child: Text(
+                            'PLease sign in to continue.',
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
+                        ),
+                        SizedBox(height: 30),
+                        TextInput(
+                            controller: emailController,
+                            hint: 'Email',
+                            icon: 'email',
+                            obscureText: false),
+                        SizedBox(height: 10),
+                        TextInput(
+                            controller: passwordController,
+                            hint: 'Password',
+                            icon: 'password',
+                            obscureText: true),
+                        SizedBox(height: 30),
+                      ],
+                    ),
+                    SubmitButton(
+                      title: 'SIGN IN',
+                      onPressed: () {
+                        context.read<AuthenticationService>().signIn(
+                              email: emailController.text.trim(),
+                              password: passwordController.text.trim(),
+                            );
+                      },
+                    ),
+                    SizedBox(height: 10),
+                    TextButton(
+                      onPressed: () {},
+                      style: ButtonStyle(
+                        splashFactory: NoSplash.splashFactory,
+                      ),
+                      child: Text(
+                        'Forget Password?',
+                        style: TextStyle(color: Colors.yellow),
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  margin: EdgeInsets.only(bottom: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Don't have an account?",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SignUpScreen()),
+                          );
+                        },
+                        style: ButtonStyle(
+                          splashFactory: NoSplash.splashFactory,
+                        ),
+                        child: Text(
+                          'Sign up',
+                          style: TextStyle(color: Colors.yellow),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
