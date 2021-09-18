@@ -1,6 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/components/submit_button.dart';
 import 'package:flutter_assignme/screens/components/text_input.dart';
+import 'package:flutter_assignme/services/authentication_service.dart';
+import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatelessWidget {
   final TextEditingController fullNameController = TextEditingController();
@@ -96,7 +100,25 @@ class SignUpScreen extends StatelessWidget {
                       ),
                       SubmitButton(
                         title: 'SIGN UP',
-                        onPressed: () {},
+                        onPressed: () {
+                          context
+                              .read<AuthenticationService>()
+                              .signUpWithEmail(
+                                email: emailController.text.trim(),
+                                password: passwordController.text.trim(),
+                              )
+                              .then((value) async {
+                            User? user = FirebaseAuth.instance.currentUser;
+                            await FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(user!.uid)
+                                .set({
+                              'uid': user.uid,
+                              'email': emailController.text.trim(),
+                              'password': passwordController.text.trim(),
+                            });
+                          });
+                        },
                       ),
                     ],
                   ),

@@ -15,7 +15,7 @@ class HomeScreen extends StatelessWidget {
         Text("HOME"),
         TextButton(
           onPressed: () {
-            context.read<AuthenticationService>().signOut();
+            context.read<AuthenticationService>().signOutWithGoogle();
           },
           child: Text("Sign out"),
         ),
