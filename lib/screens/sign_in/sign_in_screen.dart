@@ -75,10 +75,9 @@ class SignInScreen extends StatelessWidget {
                     SubmitButton(
                       title: 'SIGN IN',
                       onPressed: () {
-                        context.read<AuthenticationService>().signIn(
-                              email: emailController.text.trim(),
-                              password: passwordController.text.trim(),
-                            );
+                        context
+                            .read<AuthenticationService>()
+                            .signInWithGoogle();
                       },
                     ),
                     SizedBox(height: 10),
@@ -130,5 +129,3 @@ class SignInScreen extends StatelessWidget {
     );
   }
 }
-
-
