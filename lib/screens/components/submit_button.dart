@@ -18,7 +18,7 @@ class SubmitButton extends StatelessWidget {
           shape: new RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),
-          fixedSize: Size(MediaQuery.of(context).size.width * 0.45, 60),
+          fixedSize: Size(MediaQuery.of(context).size.width * 0.45, 55),
           primary: Colors.yellow),
       child: Text(
         title,

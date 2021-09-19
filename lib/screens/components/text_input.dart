@@ -26,7 +26,7 @@ class _TextInputState extends State<TextInput> {
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.8,
-      height: 60,
+      height: 55,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         color: isFocus ? Colors.grey[700] : Colors.grey[850],
