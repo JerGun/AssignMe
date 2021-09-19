@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -47,7 +48,7 @@ class AuthenticationService {
     try {
       final googleUser = await googleSignIn.signIn();
 
-      if (googleUser == null) return ;
+      if (googleUser == null) return;
       _user = googleUser;
 
       final googleAuth = await googleUser.authentication;
@@ -57,7 +58,13 @@ class AuthenticationService {
         idToken: googleAuth.idToken,
       );
 
-      await _firebaseAuth.signInWithCredential(credential);
+      final authResult = await _firebaseAuth.signInWithCredential(credential);
+      if (authResult.additionalUserInfo!.isNewUser) {
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(authResult.user!.uid)
+            .set({'uid': authResult.user!.uid, 'role': 'new'});
+      }
     } catch (e) {
       print(e.toString());
     }
