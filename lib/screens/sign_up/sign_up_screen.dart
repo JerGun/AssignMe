@@ -36,7 +36,9 @@ class SignUpScreen extends StatelessWidget {
                           margin: EdgeInsets.only(top: 40, left: 20),
                           child: TextButton(
                             onPressed: () {
-                              Navigator.pop(context);
+                              context
+                                  .read<AuthenticationService>()
+                                  .signOutWithGoogle();
                             },
                             style: ButtonStyle(
                               splashFactory: NoSplash.splashFactory,
