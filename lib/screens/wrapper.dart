@@ -14,20 +14,22 @@ class Wrapper extends StatelessWidget {
     var role;
 
     if (firebaseUser != null) {
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(firebaseUser.uid)
-          .get()
-          .then((DocumentSnapshot documentSnapshot) {
-        print('Role: ${documentSnapshot['role']}');
-        role = documentSnapshot['role'];
-      });
-      print(role);
-      if (role != 'new') {
-        return HomeScreen();
-      } else {
-        return SignUpScreen();
-      }
+      CollectionReference users =
+          FirebaseFirestore.instance.collection('users');
+      return FutureBuilder<DocumentSnapshot>(
+        future: users.doc(firebaseUser.uid).get(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          Map<String, dynamic> data =
+              snapshot.data!.data() as Map<String, dynamic>;
+          if (data['role'] == 'new') return SignUpScreen();
+          return HomeScreen();
+        },
+      );
     }
     return SignInScreen();
   }
