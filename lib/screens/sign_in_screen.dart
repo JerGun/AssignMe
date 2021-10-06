@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/components/submit_button.dart';
 import 'package:flutter_assignme/screens/components/text_input.dart';
-import 'package:flutter_assignme/screens/sign_up/sign_up_screen.dart';
 import 'package:flutter_assignme/services/authentication_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
-import '../components/behavior.dart';
+import 'components/behavior.dart';
 
 class SignInScreen extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();

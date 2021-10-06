@@ -49,7 +49,6 @@ class AuthenticationService {
       final googleUser = await googleSignIn.signIn();
 
       if (googleUser == null) return;
-      _user = googleUser;
 
       final googleAuth = await googleUser.authentication;
 
@@ -71,7 +70,7 @@ class AuthenticationService {
   }
 
   Future signOutWithGoogle() async {
-    await googleSignIn.disconnect();
-    _firebaseAuth.signOut();
+    await googleSignIn.signOut();
+    await _firebaseAuth.signOut();
   }
 }

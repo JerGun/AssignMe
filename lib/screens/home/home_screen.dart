@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_assignme/services/authentication_service.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_assignme/screens/menu_screen.dart';
+
+import '../main_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
@@ -9,17 +10,31 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text("HOME"),
-        TextButton(
-          onPressed: () {
-            context.read<AuthenticationService>().signOutWithGoogle();
-          },
-          child: Text("Sign out"),
+      body: Container(
+        color: Colors.grey[900],
+        child: SafeArea(
+          child: Stack(
+            children: [
+              MenuScreen(),
+              MainScreen(),
+            ],
+          ),
         ),
-      ],
-    ));
+      ),
+      // bottomNavigationBar: BottomNavigationBar(
+      //   showSelectedLabels: false,
+      //   showUnselectedLabels: false,
+      //   items: [
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.home),
+      //       label: 'Home',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.business),
+      //       label: 'Business',
+      //     ),
+      //   ],
+      // ),
+    );
   }
 }
