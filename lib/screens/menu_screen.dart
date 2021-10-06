@@ -9,6 +9,8 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
+  int teamSelectedIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -29,14 +31,29 @@ class _MenuScreenState extends State<MenuScreen> {
                             children: [
                               SizedBox(height: 20),
                               Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(40),
-                                    color: Colors.grey[800]),
-                                child: Icon(
-                                  Icons.chat_bubble,
-                                  color: Colors.grey,
+                                width: 55,
+                                height: 55,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      teamSelectedIndex = 0;
+                                    });
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      shape: new RoundedRectangleBorder(
+                                        borderRadius: teamSelectedIndex == 0
+                                            ? BorderRadius.circular(20)
+                                            : BorderRadius.circular(40),
+                                      ),
+                                      primary: teamSelectedIndex == index
+                                          ? Colors.yellow
+                                          : Colors.grey[800]),
+                                  child: Icon(
+                                    Icons.chat_bubble,
+                                    color: teamSelectedIndex == 0
+                                        ? Colors.grey[900]
+                                        : Colors.grey,
+                                  ),
                                 ),
                               ),
                               SizedBox(
@@ -53,14 +70,29 @@ class _MenuScreenState extends State<MenuScreen> {
                         : Column(
                             children: [
                               Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(40),
-                                    color: Colors.grey[800]),
-                                child: Icon(
-                                  Icons.chat_bubble,
-                                  color: Colors.grey,
+                                width: 55,
+                                height: 55,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      teamSelectedIndex = index;
+                                    });
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      shape: new RoundedRectangleBorder(
+                                        borderRadius: teamSelectedIndex == index
+                                            ? BorderRadius.circular(20)
+                                            : BorderRadius.circular(40),
+                                      ),
+                                      primary: teamSelectedIndex == index
+                                          ? Colors.yellow
+                                          : Colors.grey[800]),
+                                  child: Icon(
+                                    Icons.chat_bubble,
+                                    color: teamSelectedIndex == index
+                                        ? Colors.grey[900]
+                                        : Colors.grey,
+                                  ),
                                 ),
                               ),
                               SizedBox(height: 10),
@@ -95,7 +127,7 @@ class _MenuScreenState extends State<MenuScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Team',
+                          'Team ${teamSelectedIndex.toString()}',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -200,7 +232,8 @@ class _MenuScreenState extends State<MenuScreen> {
                       },
                     ),
                   ),
-                )
+                ),
+                SizedBox(height: 10),
               ],
             ),
           ),
