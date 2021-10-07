@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/components/submit_button.dart';
 import 'package:flutter_assignme/screens/components/text_input.dart';
-import 'package:flutter_assignme/screens/home/home_screen.dart';
+import 'package:flutter_assignme/screens/home_screen.dart';
 import 'package:flutter_assignme/services/authentication_service.dart';
 import 'package:provider/provider.dart';
 

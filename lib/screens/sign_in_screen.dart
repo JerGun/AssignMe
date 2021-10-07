@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/components/submit_button.dart';
 import 'package:flutter_assignme/screens/components/text_input.dart';
+import 'package:flutter_assignme/screens/create_group.dart';
 import 'package:flutter_assignme/services/authentication_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -79,6 +80,10 @@ class SignInScreen extends StatelessWidget {
                     SubmitButton(
                       title: 'Sign in',
                       onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CreateGroupScreen()));
                         // context.read<AuthenticationService>().signInWithEmail(
                         //     email: emailController.text.trim(),
                         //     password: passwordController.text.trim());

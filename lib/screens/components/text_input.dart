@@ -8,12 +8,14 @@ class TextInput extends StatefulWidget {
     required this.obscureText,
     required this.icon,
     this.hint = '',
+    this.clear = false,
   }) : super(key: key);
 
   final TextEditingController controller;
   final bool obscureText;
   final String icon;
   final String hint;
+  final bool clear;
 
   @override
   _TextInputState createState() => _TextInputState();
