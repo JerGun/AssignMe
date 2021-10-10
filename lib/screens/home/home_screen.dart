@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_assignme/screens/create_channel_screen.dart';
-import 'package:flutter_assignme/screens/friend_screen.dart';
+import 'package:flutter_assignme/screens/assignment_screen.dart';
+import 'package:flutter_assignme/screens/create_message_screen.dart';
 import 'package:flutter_assignme/screens/home/components/create_group_button.dart';
 import 'package:flutter_assignme/screens/home/components/direct_messages_button.dart';
 import 'package:flutter_assignme/screens/home/components/group_button.dart';
@@ -11,7 +11,7 @@ import 'package:flutter_assignme/services/authentication_service.dart';
 import 'package:provider/provider.dart';
 
 import '../components/behavior.dart';
-import '../create_group_screen.dart';
+import 'components/channel_option_button.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -20,50 +20,55 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final Duration duration = const Duration(milliseconds: 300);
 
-  late AnimationController _controller;
+  late AnimationController _pageController;
+  late AnimationController _bottomNavController;
 
   int _selectedIndex = 0;
   int groupSelectedIndex = 0;
   String groupName = 'Direct Messages';
-  String channelName = 'Direct Messages';
+  String channelName = 'General';
+  String selectedGroupID = '';
   String groupID = '';
   bool isCollapsed = true;
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      _selectedIndex == 1
-          ? Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => FriendScreen()),
-            )
-          : Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ProfileScreen()),
-            );
+      switch (_selectedIndex) {
+        case 1:
+          Navigator.push(context, MaterialPageRoute(builder: (context) => AssignmentScreen()));
+          break;
+        case 2:
+          Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen()));
+          break;
+        default:
+      }
     });
   }
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: duration);
+    _pageController = AnimationController(vsync: this, duration: duration);
+    _bottomNavController = AnimationController(vsync: this, duration: duration);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _pageController.dispose();
+    _bottomNavController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Container(
         color: Colors.grey[900],
         child: SafeArea(
@@ -132,11 +137,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             width: MediaQuery.of(context).size.width,
                             color: Colors.grey[800],
                             child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                              padding: EdgeInsets.only(left: 20, top: 10, bottom: 10),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Flexible(
+                                  Expanded(
                                     child: Text(
                                       groupName,
                                       overflow: TextOverflow.ellipsis,
@@ -149,12 +154,18 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                   ),
                                   IconButton(
                                     onPressed: () {
-                                      print(FirebaseAuth.instance.currentUser!.uid);
+                                      Navigator.push(
+                                          context, MaterialPageRoute(builder: (context) => CreateMessageScreen()));
                                     },
-                                    icon: Icon(
-                                      Icons.more_vert,
-                                      color: Colors.white,
-                                    ),
+                                    icon: groupName == 'Direct Messages'
+                                        ? Icon(
+                                            Icons.add,
+                                            color: Colors.white,
+                                          )
+                                        : Icon(
+                                            Icons.more_vert,
+                                            color: Colors.white,
+                                          ),
                                   ),
                                 ],
                               ),
@@ -176,34 +187,49 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                       : ListView.builder(
                                           itemCount: snapshot.data!.docs.length + 1,
                                           itemBuilder: (context, index) {
-                                            return index == 0
-                                                ? ChannelOptionButton(groupID: groupID)
-                                                : Container(
-                                                    margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(5),
-                                                      color: Colors.grey[700],
-                                                    ),
-                                                    height: 40,
-                                                    child: ElevatedButton(
-                                                      onPressed: () {
-                                                        setState(() {
-                                                          channelName = snapshot.data!.docs[index - 1].get('name');
-                                                          isCollapsed = !isCollapsed;
-                                                        });
-                                                      },
-                                                      child: Align(
-                                                        alignment: Alignment.centerLeft,
-                                                        child: Text(
-                                                          snapshot.data!.docs[index - 1].get('name'),
-                                                          style: TextStyle(color: Colors.white),
+                                            return groupName == 'Direct Messages'
+                                                ? Container()
+                                                : index == 0
+                                                    ? ChannelOptionButton(groupID: groupID)
+                                                    : Container(
+                                                        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(5),
+                                                          color: (snapshot.data!.docs[index - 1].get('name') ==
+                                                                      channelName &&
+                                                                  snapshot.data!.docs[index - 1].get('group') ==
+                                                                      selectedGroupID)
+                                                              ? Colors.grey[700]
+                                                              : Colors.grey[800],
                                                         ),
-                                                      ),
-                                                      style: ElevatedButton.styleFrom(
-                                                          splashFactory: NoSplash.splashFactory,
-                                                          primary: Colors.grey[700]),
-                                                    ),
-                                                  );
+                                                        height: 40,
+                                                        child: TextButton(
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              channelName = snapshot.data!.docs[index - 1].get('name');
+                                                              selectedGroupID =
+                                                                  snapshot.data!.docs[index - 1].get('group');
+                                                              isCollapsed = !isCollapsed;
+                                                            });
+                                                          },
+                                                          child: Align(
+                                                            alignment: Alignment.centerLeft,
+                                                            child: Text(
+                                                              snapshot.data!.docs[index - 1].get('name'),
+                                                              style: TextStyle(
+                                                                  color: (snapshot.data!.docs[index - 1].get('name') ==
+                                                                              channelName &&
+                                                                          snapshot.data!.docs[index - 1].get('group') ==
+                                                                              selectedGroupID)
+                                                                      ? Colors.white
+                                                                      : Colors.grey),
+                                                            ),
+                                                          ),
+                                                          style: ButtonStyle(
+                                                            splashFactory: NoSplash.splashFactory,
+                                                          ),
+                                                        ),
+                                                      );
                                           },
                                         );
                                 },
@@ -240,10 +266,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                 child: Icon(Icons.menu, color: Colors.white),
                                 onTap: () {
                                   setState(() {
-                                    if (isCollapsed)
-                                      _controller.forward();
-                                    else
-                                      _controller.reverse();
+                                    if (isCollapsed) {
+                                      _pageController.forward();
+                                      _bottomNavController.forward();
+                                    } else {
+                                      _pageController.reverse();
+                                      _bottomNavController.reverse();
+                                    }
                                     isCollapsed = !isCollapsed;
                                   });
                                 },
@@ -286,110 +315,51 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ),
         ),
       ),
-      // bottomNavigationBar: Theme(
-      //   data: ThemeData(
-      //     splashColor: Colors.transparent,
-      //   ),
-      //   child: BottomNavigationBar(
-      //     showSelectedLabels: false,
-      //     showUnselectedLabels: false,
-      //     iconSize: 30,
-      //     selectedItemColor: Colors.yellow,
-      //     unselectedItemColor: Colors.grey[700],
-      //     backgroundColor: Colors.grey[900],
-      //     items: [
-      //       BottomNavigationBarItem(
-      //         icon: Icon(
-      //           Icons.home,
-      //         ),
-      //         label: 'Home',
-      //       ),
-      //       BottomNavigationBarItem(
-      //         icon: Icon(Icons.people),
-      //         label: 'People',
-      //       ),
-      //       BottomNavigationBarItem(
-      //         icon: Icon(Icons.person),
-      //         label: 'Person',
-      //       ),
-      //     ],
-      //     currentIndex: _selectedIndex,
-      //     onTap: _onItemTapped,
-      //   ),
-      // ),
-    );
-  }
-}
-
-class ChannelOptionButton extends StatelessWidget {
-  const ChannelOptionButton({
-    Key? key,
-    required this.groupID,
-  }) : super(key: key);
-
-  final String groupID;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(height: 20),
-        Container(
-          width: MediaQuery.of(context).size.width * 0.5,
-          height: 30,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                spreadRadius: 2,
-                blurRadius: 0,
-                offset: Offset(0, 5),
-              ),
-            ],
-            color: Colors.grey[700],
-          ),
-          child: ElevatedButton(
-            onPressed: () {},
-            child: Center(
-              child: Text(
-                'Invite Members',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-            style: ElevatedButton.styleFrom(splashFactory: NoSplash.splashFactory, primary: Colors.grey[700]),
-          ),
+      bottomNavigationBar: Theme(
+        data: ThemeData(
+          splashColor: Colors.transparent,
         ),
-        SizedBox(height: 10),
-        Padding(
-          padding: EdgeInsets.only(
-            left: 20,
-            right: 10,
-            top: 10,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: AnimatedBuilder(
+          animation: _bottomNavController,
+          builder: (context, child) {
+            return AnimatedContainer(
+              duration: duration,
+              height: isCollapsed ? 0 : 60,
+              child: child,
+            );
+          },
+          child: Wrap(
             children: [
-              Text(
-                'CHANNELS',
-                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
-              ),
-              IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => CreateChannelScreen(groupID: groupID)),
-                  );
-                },
-                icon: Icon(
-                  Icons.add,
-                  color: Colors.grey,
-                ),
+              BottomNavigationBar(
+                showSelectedLabels: false,
+                showUnselectedLabels: false,
+                iconSize: 30,
+                selectedItemColor: Colors.yellow,
+                unselectedItemColor: Colors.grey[700],
+                backgroundColor: Colors.grey[900],
+                items: [
+                  BottomNavigationBarItem(
+                    icon: Icon(
+                      Icons.home,
+                    ),
+                    label: 'Home',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.people),
+                    label: 'People',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.person),
+                    label: 'Person',
+                  ),
+                ],
+                currentIndex: _selectedIndex,
+                onTap: _onItemTapped,
               ),
             ],
           ),
         ),
-      ],
+      ),
     );
   }
 }

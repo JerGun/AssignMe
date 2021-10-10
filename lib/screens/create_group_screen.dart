@@ -54,7 +54,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 Align(
                   alignment: Alignment.topLeft,
                   child: Container(
-                    margin: EdgeInsets.only(top: 40, left: 20),
+                    margin: EdgeInsets.only(top: 20, left: 20),
                     child: TextButton(
                       onPressed: () {
                         Fluttertoast.cancel();

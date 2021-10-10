@@ -14,11 +14,9 @@ class AuthenticationService {
 
   Stream<User?> get authStateChanges => _firebaseAuth.idTokenChanges();
 
-  Future<String?> signUpWithEmail(
-      {required String email, required String password}) async {
+  Future<String?> signUpWithEmail({required String email, required String password}) async {
     try {
-      await _firebaseAuth.createUserWithEmailAndPassword(
-          email: email, password: password);
+      await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
       return "Signed up";
     } on FirebaseAuthException catch (e) {
       e.code == 'weak-password'
@@ -29,11 +27,9 @@ class AuthenticationService {
     }
   }
 
-  Future<String?> signInWithEmail(
-      {required String email, required String password}) async {
+  Future<String?> signInWithEmail({required String email, required String password}) async {
     try {
-      await _firebaseAuth.signInWithEmailAndPassword(
-          email: email, password: password);
+      await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
       return "Signed in";
     } on FirebaseAuthException catch (e) {
       return e.message;
@@ -59,10 +55,10 @@ class AuthenticationService {
 
       final authResult = await _firebaseAuth.signInWithCredential(credential);
       if (authResult.additionalUserInfo!.isNewUser) {
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(authResult.user!.uid)
-            .set({'uid': authResult.user!.uid, 'role': 'new'});
+        FirebaseFirestore.instance.collection('users').doc(authResult.user!.uid).set({
+          'uid': authResult.user!.uid,
+          'role': 'new',
+        });
       }
     } catch (e) {
       print(e.toString());
