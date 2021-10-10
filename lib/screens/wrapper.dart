@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/sign_up_screen.dart';
 import 'package:provider/provider.dart';
 
-import 'home_screen.dart';
+import 'home/home_screen.dart';
 import 'sign_in_screen.dart';
 
 class Wrapper extends StatelessWidget {
