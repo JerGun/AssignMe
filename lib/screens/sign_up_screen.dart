@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/components/submit_button.dart';
 import 'package:flutter_assignme/screens/components/text_input.dart';
-import 'package:flutter_assignme/screens/home_screen.dart';
+import 'package:flutter_assignme/screens/home/home_screen.dart';
 import 'package:flutter_assignme/services/authentication_service.dart';
 import 'package:provider/provider.dart';
 
@@ -21,6 +21,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
   String role = 'teacher';
   bool firstNameError = false;
   bool lastNameError = false;
+
+  Future signUp() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    firstNameController.text == ''
+        ? firstNameError = true
+        : lastNameController.text == ''
+            ? lastNameError = true
+            : await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({
+                'role': role,
+                'firstName': firstNameController.text,
+                'lastName': lastNameController.text
+              }).then((value) => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,9 +60,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           margin: EdgeInsets.only(top: 40, left: 20),
                           child: TextButton(
                             onPressed: () {
-                              context
-                                  .read<AuthenticationService>()
-                                  .signOutWithGoogle();
+                              context.read<AuthenticationService>().signOutWithGoogle();
                             },
                             style: ButtonStyle(
                               splashFactory: NoSplash.splashFactory,
@@ -66,16 +80,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             Text(
                               'Create Account',
                               textAlign: TextAlign.left,
-                              style: TextStyle(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
+                              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white),
                             ),
                             SizedBox(height: 10),
                             Text(
                               'PLease fill the input blow here.',
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.white),
+                              style: TextStyle(fontSize: 16, color: Colors.white),
                             ),
                             SizedBox(height: 30),
                             Row(
@@ -85,9 +95,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   height: 50,
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20),
-                                      color: role == 'teacher'
-                                          ? Colors.yellow
-                                          : Colors.grey[800]),
+                                      color: role == 'teacher' ? Colors.yellow : Colors.grey[800]),
                                   child: TextButton(
                                     onPressed: () {
                                       setState(() {
@@ -96,10 +104,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     },
                                     child: Text(
                                       'Teacher',
-                                      style: TextStyle(
-                                          color: role == 'teacher'
-                                              ? Colors.black
-                                              : Colors.grey),
+                                      style: TextStyle(color: role == 'teacher' ? Colors.black : Colors.grey),
                                     ),
                                     style: ButtonStyle(
                                       splashFactory: NoSplash.splashFactory,
@@ -112,9 +117,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   height: 50,
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20),
-                                      color: role == 'student'
-                                          ? Colors.yellow
-                                          : Colors.grey[800]),
+                                      color: role == 'student' ? Colors.yellow : Colors.grey[800]),
                                   child: TextButton(
                                     onPressed: () {
                                       setState(() {
@@ -123,10 +126,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     },
                                     child: Text(
                                       'Student',
-                                      style: TextStyle(
-                                          color: role == 'student'
-                                              ? Colors.black
-                                              : Colors.grey),
+                                      style: TextStyle(color: role == 'student' ? Colors.black : Colors.grey),
                                     ),
                                     style: ButtonStyle(
                                       splashFactory: NoSplash.splashFactory,
@@ -143,10 +143,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 obscureText: false),
                             SizedBox(height: 10),
                             TextInput(
-                                controller: lastNameController,
-                                hint: 'Last Name',
-                                icon: 'person',
-                                obscureText: false),
+                                controller: lastNameController, hint: 'Last Name', icon: 'person', obscureText: false),
                             // TextInput(
                             //     controller: emailController,
                             //     hint: 'Email',
@@ -168,27 +165,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ],
                         ),
                       ),
-                      SubmitButton(
-                          title: 'SIGN UP',
-                          onPressed: () async {
-                            User? user = FirebaseAuth.instance.currentUser;
-                            firstNameController.text == ''
-                                ? firstNameError = true
-                                : lastNameController.text == ''
-                                    ? lastNameError = true
-                                    : await FirebaseFirestore.instance
-                                        .collection('users')
-                                        .doc(user!.uid)
-                                        .update({
-                                        'role': role,
-                                        'firstName': firstNameController.text,
-                                        'lastName': lastNameController.text
-                                      }).then((value) => Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    HomeScreen())));
-                          }),
+                      SubmitButton(title: 'SIGN UP', onPressed: () async {}),
                     ],
                   ),
                 ),

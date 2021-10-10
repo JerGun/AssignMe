@@ -15,6 +15,28 @@ class CreateGroupScreen extends StatefulWidget {
 class _CreateGroupScreenState extends State<CreateGroupScreen> {
   final TextEditingController groupNameController = TextEditingController();
 
+  Future createGroup() async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (groupNameController.text.isEmpty) {
+      Fluttertoast.showToast(
+        msg: "Group name is required.",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+      );
+    } else {
+      DocumentReference groupDoc = await FirebaseFirestore.instance.collection('groups').add({
+        'owners': user!.uid,
+        'name': groupNameController.text,
+      });
+      FirebaseFirestore.instance.collection('groups').doc(groupDoc.id).update({'gid': groupDoc.id});
+      FirebaseFirestore.instance.collection('channels').add({
+        'group': groupDoc.id,
+        'name': 'General',
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,30 +104,10 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 SubmitButton(
                     title: 'Create Group',
                     onPressed: () async {
-                      User? user = FirebaseAuth.instance.currentUser;
-
-                      if (groupNameController.text.isEmpty) {
-                        Fluttertoast.showToast(
-                          msg: "Group name is required.",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.CENTER,
-                        );
-                      } else {
-                        DocumentReference groupDoc = await FirebaseFirestore
-                            .instance
-                            .collection('groups')
-                            .add({
-                          'owners': user!.uid,
-                          'name': groupNameController.text,
-                        });
-                        FirebaseFirestore.instance.collection('channels').add({
-                          'group': groupDoc.id,
-                          'name': 'General',
-                        }).then((value) => () {
-                              Fluttertoast.cancel();
-                              Navigator.pop(context);
-                            });
-                      }
+                      createGroup().then((value) => {
+                            Fluttertoast.cancel(),
+                            Navigator.pop(context),
+                          });
                     }),
               ],
             ),
