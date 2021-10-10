@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +32,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ? lastNameError = true
             : await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({
                 'role': role,
+                'tag': Random().nextInt(9999),
                 'firstName': firstNameController.text,
                 'lastName': lastNameController.text
               }).then((value) => Navigator.push(
@@ -165,7 +168,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ],
                         ),
                       ),
-                      SubmitButton(title: 'SIGN UP', onPressed: () async {}),
+                      SubmitButton(
+                          title: 'SIGN UP',
+                          onPressed: () {
+                            signUp();
+                          }),
                     ],
                   ),
                 ),

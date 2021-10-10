@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class GroupButton extends StatelessWidget {
   const GroupButton({
@@ -26,8 +27,8 @@ class GroupButton extends StatelessWidget {
                   borderRadius: groupSelectedIndex == index ? BorderRadius.circular(20) : BorderRadius.circular(40),
                 ),
                 primary: groupSelectedIndex == index ? Colors.yellow : Colors.grey[800]),
-            child: Icon(
-              Icons.chat_bubble,
+            child: SvgPicture.asset(
+              'assets/icons/group.svg',
               color: groupSelectedIndex == index ? Colors.grey[900] : Colors.grey,
             ),
           ),
