@@ -20,24 +20,26 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
   User? user = FirebaseAuth.instance.currentUser;
 
   Future inviteMember(String inviteeID) async {
-    if (inviteeID == user!.uid) {
+    if (inviteeID != user!.uid) {
       FirebaseFirestore.instance.collection('invites').add({
         'group': widget.groupID,
         'invitee': inviteeID,
         'inviter': user!.uid,
         'status': false,
       });
-    } else {
-      Fluttertoast.showToast(
-        msg: "Can't invite yourself",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    Stream<QuerySnapshot> streamAll = FirebaseFirestore.instance.collection('users').snapshots();
+
+    Stream<QuerySnapshot> streamTag = FirebaseFirestore.instance
+        .collection('users')
+        .where('tag',
+            isEqualTo: searchController.text.length > 1 ? searchController.text.substring(1) : searchController.text)
+        .snapshots();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -104,16 +106,11 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
             ),
             Expanded(
               child: Container(
+                margin: EdgeInsets.only(top: 10),
                 child: ScrollConfiguration(
                   behavior: Behavior(),
                   child: StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection('users')
-                        .where('tag',
-                            isEqualTo: searchController.text.length > 1
-                                ? searchController.text.substring(1)
-                                : searchController.text)
-                        .snapshots(),
+                    stream: searchController.text.isEmpty ? streamAll : streamTag,
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
                         return Center(
@@ -124,7 +121,7 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
                         itemCount: snapshot.data!.docs.length,
                         itemBuilder: (context, index) {
                           return Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -138,24 +135,30 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
                                     ),
                                     SizedBox(width: 20),
                                     Text(
-                                      snapshot.data!.docs[index].get('firstName'),
+                                      '${snapshot.data!.docs[index].get('firstName')} ${snapshot.data!.docs[index].get('lastName')}',
                                       style: TextStyle(color: Colors.white),
                                     ),
                                   ],
                                 ),
                                 ElevatedButton(
                                   onPressed: () {
-                                    inviteMember(snapshot.data!.docs[index].get('uid'));
+                                    if (user!.uid != snapshot.data!.docs[index].get('uid'))
+                                      inviteMember(snapshot.data!.docs[index].get('uid'));
                                   },
                                   style: ElevatedButton.styleFrom(
                                       shape: new RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(5),
                                       ),
                                       fixedSize: Size(MediaQuery.of(context).size.width * 0.2, 30),
-                                      primary: Colors.yellow),
+                                      primary: user!.uid != snapshot.data!.docs[index].get('uid')
+                                          ? Colors.yellow
+                                          : Colors.red),
                                   child: Text(
                                     'Invite',
-                                    style: TextStyle(color: Colors.grey[850]),
+                                    style: TextStyle(
+                                        color: user!.uid != snapshot.data!.docs[index].get('uid')
+                                            ? Colors.grey[850]
+                                            : Colors.white),
                                   ),
                                 )
                               ],
