@@ -7,9 +7,11 @@ class ChannelOptionButton extends StatelessWidget {
   const ChannelOptionButton({
     Key? key,
     required this.groupID,
+    required this.groupName,
   }) : super(key: key);
 
   final String groupID;
+  final String groupName;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,7 @@ class ChannelOptionButton extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => InviteMemberScreen(groupID: groupID)),
+                MaterialPageRoute(builder: (context) => InviteMemberScreen(groupID: groupID, groupName: groupName,)),
               );
             },
             child: Center(

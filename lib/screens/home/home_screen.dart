@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/create_message_screen.dart';
 import 'package:flutter_assignme/screens/home/components/create_group_button.dart';
-import 'package:flutter_assignme/screens/home/components/direct_messages_button.dart';
+import 'package:flutter_assignme/screens/home/components/notifications_button.dart';
 import 'package:flutter_assignme/screens/home/components/group_button.dart';
 import 'package:flutter_assignme/screens/profile_screen.dart';
 import 'package:flutter_assignme/services/authentication_service.dart';
@@ -29,13 +29,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   int _selectedIndex = 0;
   int groupSelectedIndex = 0;
-  String groupName = 'Direct Messages';
+  String groupName = 'Notifications';
   String channelName = 'General';
   String selectedGroupID = '';
   String groupID = '';
   bool isCollapsed = true;
 
   late List<Widget> _children;
+
+  User? user = FirebaseAuth.instance.currentUser;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -59,6 +61,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    Future<QuerySnapshot> streamInvite =
+        FirebaseFirestore.instance.collection('invites').where('invitee', isEqualTo: user!.uid).get();
     _children = [
       Stack(
         children: [
@@ -86,13 +90,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 itemCount: snapshot.data!.docs.length + 2,
                                 itemBuilder: (context, index) {
                                   return index == 0
-                                      ? DirectMessagesButton(
+                                      ? NotificationButton(
                                           groupSelectedIndex: groupSelectedIndex,
                                           index: index,
                                           onPressed: () {
                                             setState(() {
                                               groupSelectedIndex = index;
-                                              groupName = 'Direct Messages';
+                                              groupName = 'Notifications';
                                             });
                                           })
                                       : index == snapshot.data!.docs.length + 1
@@ -142,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               ),
                               IconButton(
                                 onPressed: () {
-                                  groupName == 'Direct Messages'
+                                  groupName == 'Notifications'
                                       ? Navigator.push(
                                           context, MaterialPageRoute(builder: (context) => CreateMessageScreen()))
                                       : showModalBottomSheet(
@@ -168,10 +172,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           },
                                         );
                                 },
-                                icon: groupName == 'Direct Messages'
+                                icon: groupName == 'Notifications'
                                     ? Icon(
                                         Icons.add,
-                                        color: Colors.white,
+                                        color: Colors.grey[800],
                                       )
                                     : Icon(
                                         Icons.more_vert,
@@ -182,70 +186,100 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           ),
                         ),
                       ),
-                      Expanded(
-                        child: ScrollConfiguration(
-                          behavior: Behavior(),
-                          child: StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('channels')
-                                .where('group', isEqualTo: groupID)
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              return !snapshot.hasData
-                                  ? Center(
-                                      child: CircularProgressIndicator(),
-                                    )
-                                  : ListView.builder(
-                                      itemCount: snapshot.data!.docs.length + 1,
-                                      itemBuilder: (context, index) {
-                                        return groupName == 'Direct Messages'
-                                            ? Container()
-                                            : index == 0
-                                                ? ChannelOptionButton(groupID: groupID)
-                                                : Container(
-                                                    margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(5),
-                                                      color:
-                                                          (snapshot.data!.docs[index - 1].get('name') == channelName &&
-                                                                  snapshot.data!.docs[index - 1].get('group') ==
-                                                                      selectedGroupID)
-                                                              ? Colors.grey[700]
-                                                              : Colors.grey[800],
-                                                    ),
-                                                    height: 40,
-                                                    child: TextButton(
-                                                      onPressed: () {
-                                                        setState(() {
-                                                          channelName = snapshot.data!.docs[index - 1].get('name');
-                                                          selectedGroupID = snapshot.data!.docs[index - 1].get('group');
-                                                          isCollapsed = !isCollapsed;
-                                                        });
-                                                      },
-                                                      child: Align(
-                                                        alignment: Alignment.centerLeft,
-                                                        child: Text(
-                                                          snapshot.data!.docs[index - 1].get('name'),
-                                                          style: TextStyle(
-                                                              color: (snapshot.data!.docs[index - 1].get('name') ==
-                                                                          channelName &&
-                                                                      snapshot.data!.docs[index - 1].get('group') ==
-                                                                          selectedGroupID)
-                                                                  ? Colors.white
-                                                                  : Colors.grey),
-                                                        ),
+                      groupName == 'Notifications'
+                          ? Expanded(
+                              child: ScrollConfiguration(
+                                behavior: Behavior(),
+                                child: StreamBuilder<QuerySnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('invites')
+                                      .where('invitee', isEqualTo: user!.uid)
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    if (!snapshot.hasData) {
+                                      return Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    } else {
+                                      return ListView.builder(
+                                        itemCount: snapshot.data!.docs.length,
+                                        itemBuilder: (context, index) {
+                                          return Container(
+                                            child: Text(snapshot.data!.docs[index].get('groupName')),
+                                          );
+                                        },
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                            )
+                          : Expanded(
+                              child: ScrollConfiguration(
+                                behavior: Behavior(),
+                                child: StreamBuilder<QuerySnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('channels')
+                                      .where('group', isEqualTo: groupID)
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    if (!snapshot.hasData) {
+                                      return Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    } else {
+                                      return ListView.builder(
+                                        itemCount: snapshot.data!.docs.length + 1,
+                                        itemBuilder: (context, index) {
+                                          return index == 0
+                                              ? ChannelOptionButton(
+                                                  groupID: groupID,
+                                                  groupName: groupName,
+                                                )
+                                              : Container(
+                                                  margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(5),
+                                                    color: (snapshot.data!.docs[index - 1].get('name') == channelName &&
+                                                            snapshot.data!.docs[index - 1].get('group') ==
+                                                                selectedGroupID)
+                                                        ? Colors.grey[700]
+                                                        : Colors.grey[800],
+                                                  ),
+                                                  height: 40,
+                                                  child: TextButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        channelName = snapshot.data!.docs[index - 1].get('name');
+                                                        selectedGroupID = snapshot.data!.docs[index - 1].get('group');
+                                                        isCollapsed = !isCollapsed;
+                                                      });
+                                                    },
+                                                    child: Align(
+                                                      alignment: Alignment.centerLeft,
+                                                      child: Text(
+                                                        snapshot.data!.docs[index - 1].get('name'),
+                                                        style: TextStyle(
+                                                            color: (snapshot.data!.docs[index - 1].get('name') ==
+                                                                        channelName &&
+                                                                    snapshot.data!.docs[index - 1].get('group') ==
+                                                                        selectedGroupID)
+                                                                ? Colors.white
+                                                                : Colors.grey),
                                                       ),
-                                                      style: ButtonStyle(
-                                                        splashFactory: NoSplash.splashFactory,
-                                                      ),
                                                     ),
-                                                  );
-                                      },
-                                    );
-                            },
-                          ),
-                        ),
-                      ),
+                                                    style: ButtonStyle(
+                                                      splashFactory: NoSplash.splashFactory,
+                                                    ),
+                                                  ),
+                                                );
+                                        },
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                            ),
                       SizedBox(height: 10),
                     ],
                   ),

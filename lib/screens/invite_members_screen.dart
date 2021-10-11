@@ -1,14 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 import 'components/behavior.dart';
 
 class InviteMemberScreen extends StatefulWidget {
-  const InviteMemberScreen({Key? key, required this.groupID}) : super(key: key);
+  const InviteMemberScreen({
+    Key? key,
+    required this.groupID,
+    required this.groupName,
+  }) : super(key: key);
 
   final String groupID;
+  final String groupName;
 
   @override
   _InviteMemberScreenState createState() => _InviteMemberScreenState();
@@ -22,7 +26,8 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
   Future inviteMember(String inviteeID) async {
     if (inviteeID != user!.uid) {
       FirebaseFirestore.instance.collection('invites').add({
-        'group': widget.groupID,
+        'gid': widget.groupID,
+        'groupName': widget.groupName,
         'invitee': inviteeID,
         'inviter': user!.uid,
         'status': false,

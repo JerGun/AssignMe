@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class DirectMessagesButton extends StatelessWidget {
-  const DirectMessagesButton({
+class NotificationButton extends StatelessWidget {
+  const NotificationButton({
     Key? key,
     required this.groupSelectedIndex,
     required this.index,
@@ -28,7 +28,7 @@ class DirectMessagesButton extends StatelessWidget {
                 ),
                 primary: groupSelectedIndex == index ? Colors.yellow : Colors.grey[800]),
             child: Icon(
-              Icons.chat_bubble,
+              Icons.notifications,
               color: groupSelectedIndex == index ? Colors.grey[900] : Colors.grey,
             ),
           ),
