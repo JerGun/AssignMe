@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_assignme/screens/invite_members_screen.dart';
 
 import '../../create_channel_screen.dart';
 
@@ -31,7 +32,12 @@ class ChannelOptionButton extends StatelessWidget {
             color: Colors.grey[700],
           ),
           child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => InviteMemberScreen(groupID: groupID)),
+              );
+            },
             child: Center(
               child: Text(
                 'Invite Members',
