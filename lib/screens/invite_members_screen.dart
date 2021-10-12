@@ -30,6 +30,7 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
         'groupName': widget.groupName,
         'invitee': inviteeID,
         'inviter': user!.uid,
+        'timestamp': DateTime.now().millisecondsSinceEpoch,
         'status': false,
       });
     }

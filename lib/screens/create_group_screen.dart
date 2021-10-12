@@ -28,8 +28,11 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       DocumentReference groupDoc = await FirebaseFirestore.instance.collection('groups').add({
         'owners': user!.uid,
         'name': groupNameController.text,
+        'members': FieldValue.arrayUnion([user.uid]),
       });
-      FirebaseFirestore.instance.collection('groups').doc(groupDoc.id).update({'gid': groupDoc.id});
+      FirebaseFirestore.instance.collection('groups').doc(groupDoc.id).update({
+        'gid': groupDoc.id,
+      });
       FirebaseFirestore.instance.collection('channels').add({
         'group': groupDoc.id,
         'name': 'General',

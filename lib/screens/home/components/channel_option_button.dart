@@ -22,7 +22,7 @@ class ChannelOptionButton extends StatelessWidget {
           width: MediaQuery.of(context).size.width * 0.5,
           height: 30,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
+            borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
@@ -37,7 +37,11 @@ class ChannelOptionButton extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => InviteMemberScreen(groupID: groupID, groupName: groupName,)),
+                MaterialPageRoute(
+                    builder: (context) => InviteMemberScreen(
+                          groupID: groupID,
+                          groupName: groupName,
+                        )),
               );
             },
             child: Center(
@@ -46,7 +50,10 @@ class ChannelOptionButton extends StatelessWidget {
                 style: TextStyle(color: Colors.white),
               ),
             ),
-            style: ElevatedButton.styleFrom(splashFactory: NoSplash.splashFactory, primary: Colors.grey[700]),
+            style: ElevatedButton.styleFrom(
+              splashFactory: NoSplash.splashFactory,
+              primary: Colors.grey[700],
+            ),
           ),
         ),
         SizedBox(height: 10),
