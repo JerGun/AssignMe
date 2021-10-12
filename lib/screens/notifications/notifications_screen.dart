@@ -2,16 +2,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/components/behavior.dart';
 
-class Notifications extends StatefulWidget {
-  const Notifications({Key? key, required this.uid}) : super(key: key);
+class NotificationsScreen extends StatefulWidget {
+  const NotificationsScreen({Key? key, required this.uid}) : super(key: key);
 
   final String uid;
 
   @override
-  _NotificationsState createState() => _NotificationsState();
+  _NotificationsScreenState createState() => _NotificationsScreenState();
 }
 
-class _NotificationsState extends State<Notifications> {
+class _NotificationsScreenState extends State<NotificationsScreen> {
   Future joinGroup(String docID, String groupID) async {
     FirebaseFirestore.instance.collection('invites').doc(docID).update({'status': true});
     FirebaseFirestore.instance.collection('groups').doc(groupID).update({

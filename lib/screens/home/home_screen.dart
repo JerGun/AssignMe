@@ -3,7 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/create_message_screen.dart';
 import 'package:flutter_assignme/screens/home/components/create_group_button.dart';
-import 'package:flutter_assignme/screens/home/components/notifications_button.dart';
+import 'package:flutter_assignme/screens/members/members_screen.dart';
+import 'package:flutter_assignme/screens/notifications/components/notifications_button.dart';
 import 'package:flutter_assignme/screens/home/components/group_button.dart';
 import 'package:flutter_assignme/screens/profile_screen.dart';
 import 'package:flutter_assignme/services/authentication_service.dart';
@@ -11,7 +12,7 @@ import 'package:provider/provider.dart';
 
 import '../components/behavior.dart';
 import 'components/channel_option_button.dart';
-import 'components/notifications.dart';
+import '../notifications/notifications_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -37,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool isLeftCollapsed = true;
   bool isRightCollapsed = true;
   String previousWidget = 'mid';
+  int numberMembers = 0;
 
   late List<Widget> _children;
 
@@ -113,6 +115,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                       groupSelectedIndex = index;
                                                       groupName = snapshot.data!.docs[index - 1].get('name');
                                                       groupID = snapshot.data!.docs[index - 1].get('gid');
+                                                      numberMembers =
+                                                          snapshot.data!.docs[index - 1].get('members').length;
                                                     });
                                                   },
                                                 );
@@ -124,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           ),
                         ),
                         groupName == 'Notifications'
-                            ? Notifications(uid: user!.uid)
+                            ? NotificationsScreen(uid: user!.uid)
                             : Container(
                                 width: MediaQuery.of(context).size.width * 0.625,
                                 height: MediaQuery.of(context).size.height,
@@ -263,19 +267,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ],
                     ),
                   )
-                : Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
-                    color: Colors.grey[900],
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width * 0.825,
-                        height: MediaQuery.of(context).size.height,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                  ),
+                : MembersScreen(groupID: groupID, numberMembers: numberMembers),
           ),
           AnimatedPositioned(
             duration: duration,

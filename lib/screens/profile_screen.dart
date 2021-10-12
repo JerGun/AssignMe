@@ -121,7 +121,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           SizedBox(height: 10),
                           Text(
-                            'T${data['role'].toString().substring(1)}',
+                            data['role'] == 'teacher'
+                                ? 'T${data['role'].toString().substring(1)}'
+                                : 'S${data['role'].toString().substring(1)}',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
