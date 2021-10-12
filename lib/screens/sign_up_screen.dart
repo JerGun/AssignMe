@@ -7,6 +7,7 @@ import 'package:flutter_assignme/screens/components/submit_button.dart';
 import 'package:flutter_assignme/screens/components/text_input.dart';
 import 'package:flutter_assignme/screens/home/home_screen.dart';
 import 'package:flutter_assignme/services/authentication_service.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -21,15 +22,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController lastNameController = TextEditingController();
 
   String role = 'teacher';
-  bool firstNameError = false;
-  bool lastNameError = false;
 
   Future signUp() async {
     User? user = FirebaseAuth.instance.currentUser;
-    firstNameController.text == ''
-        ? firstNameError = true
-        : lastNameController.text == ''
-            ? lastNameError = true
+    firstNameController.text.isEmpty
+        ? Fluttertoast.showToast(
+            msg: "First name is required.",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+          )
+        : lastNameController.text.isEmpty
+            ? Fluttertoast.showToast(
+                msg: "Last name is required.",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.CENTER,
+              )
             : await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({
                 'role': role,
                 'tag': Random().nextInt(9999),

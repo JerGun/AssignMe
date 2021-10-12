@@ -116,7 +116,7 @@ class SignInScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(30),
                           ),
                           fixedSize: Size(
-                              MediaQuery.of(context).size.width * 0.65, 55),
+                              MediaQuery.of(context).size.width * 0.65, 50),
                           primary: Colors.yellow),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
