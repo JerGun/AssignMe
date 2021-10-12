@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/components/submit_button.dart';
-import 'package:flutter_assignme/screens/components/text_input.dart';
+import 'package:flutter_assignme/screens/components/icon_text_input.dart';
 import 'package:flutter_assignme/screens/create_group_screen.dart';
 import 'package:flutter_assignme/services/authentication_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -62,13 +62,13 @@ class SignInScreen extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 30),
-                          TextInput(
+                          IconTextInput(
                               controller: emailController,
                               hint: 'Email',
                               icon: 'email',
                               obscureText: false),
                           SizedBox(height: 10),
-                          TextInput(
+                          IconTextInput(
                               controller: passwordController,
                               hint: 'Password',
                               icon: 'password',

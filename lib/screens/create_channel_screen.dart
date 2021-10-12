@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import 'components/text_input.dart';
+import 'components/icon_text_input.dart';
 
 class CreateChannelScreen extends StatefulWidget {
   const CreateChannelScreen({
@@ -67,7 +67,7 @@ class _CreateChannelScreenState extends State<CreateChannelScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 30),
-                  TextInput(
+                  IconTextInput(
                     controller: channelNameController,
                     obscureText: false,
                     icon: 'channel',

@@ -66,10 +66,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             child: ScrollConfiguration(
               behavior: Behavior(),
               child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('invites')
-                    .where('invitee', isEqualTo: widget.uid)
-                    .snapshots(),
+                stream: FirebaseFirestore.instance.collection('invites').where('invitee', isEqualTo: widget.uid).snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return Center(
@@ -133,10 +130,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             ],
                           );
                         if (index == 0)
-                          return Center(
-                            child: Container(
-                              color: Colors.white,
-                              child: Text('Notifications'),
+                          return Container(
+                            height: MediaQuery.of(context).size.height * 0.7,
+                            alignment: Alignment.center,
+                            child: Text(
+                              'No notifications yet.',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
                             ),
                           );
                         return SizedBox();

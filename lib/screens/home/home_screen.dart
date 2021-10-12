@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_assignme/screens/assignments/add_assignment_screen.dart';
 import 'package:flutter_assignme/screens/create_message_screen.dart';
 import 'package:flutter_assignme/screens/home/components/create_group_button.dart';
 import 'package:flutter_assignme/screens/members/members_screen.dart';
@@ -82,10 +83,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           child: ScrollConfiguration(
                             behavior: Behavior(),
                             child: StreamBuilder<QuerySnapshot>(
-                              stream: FirebaseFirestore.instance
-                                  .collection('groups')
-                                  .where('members', arrayContains: FirebaseAuth.instance.currentUser!.uid)
-                                  .snapshots(),
+                              stream: FirebaseFirestore.instance.collection('groups').where('members', arrayContains: FirebaseAuth.instance.currentUser!.uid).snapshots(),
                               builder: (context, snapshot) {
                                 if (!snapshot.hasData) {
                                   return Center(
@@ -115,8 +113,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                       groupSelectedIndex = index;
                                                       groupName = snapshot.data!.docs[index - 1].get('name');
                                                       groupID = snapshot.data!.docs[index - 1].get('gid');
-                                                      numberMembers =
-                                                          snapshot.data!.docs[index - 1].get('members').length;
+                                                      numberMembers = snapshot.data!.docs[index - 1].get('members').length;
                                                     });
                                                   },
                                                 );
@@ -193,10 +190,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                       child: ScrollConfiguration(
                                         behavior: Behavior(),
                                         child: StreamBuilder<QuerySnapshot>(
-                                          stream: FirebaseFirestore.instance
-                                              .collection('channels')
-                                              .where('group', isEqualTo: groupID)
-                                              .snapshots(),
+                                          stream: FirebaseFirestore.instance.collection('channels').where('group', isEqualTo: groupID).snapshots(),
                                           builder: (context, snapshot) {
                                             if (!snapshot.hasData) {
                                               return Center(
@@ -215,10 +209,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                           margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                                                           decoration: BoxDecoration(
                                                             borderRadius: BorderRadius.circular(5),
-                                                            color: (snapshot.data!.docs[index - 1].get('name') ==
-                                                                        channelName &&
-                                                                    snapshot.data!.docs[index - 1].get('group') ==
-                                                                        selectedGroupID)
+                                                            color: (snapshot.data!.docs[index - 1].get('name') == channelName && snapshot.data!.docs[index - 1].get('group') == selectedGroupID)
                                                                 ? Colors.grey[700]
                                                                 : Colors.grey[850],
                                                           ),
@@ -226,10 +217,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                           child: TextButton(
                                                             onPressed: () {
                                                               setState(() {
-                                                                channelName =
-                                                                    snapshot.data!.docs[index - 1].get('name');
-                                                                selectedGroupID =
-                                                                    snapshot.data!.docs[index - 1].get('group');
+                                                                channelName = snapshot.data!.docs[index - 1].get('name');
+                                                                selectedGroupID = snapshot.data!.docs[index - 1].get('group');
                                                                 isLeftCollapsed = !isLeftCollapsed;
                                                               });
                                                             },
@@ -238,14 +227,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                               child: Text(
                                                                 snapshot.data!.docs[index - 1].get('name'),
                                                                 style: TextStyle(
-                                                                    color:
-                                                                        (snapshot.data!.docs[index - 1].get('name') ==
-                                                                                    channelName &&
-                                                                                snapshot.data!.docs[index - 1]
-                                                                                        .get('group') ==
-                                                                                    selectedGroupID)
-                                                                            ? Colors.white
-                                                                            : Colors.grey),
+                                                                    color: (snapshot.data!.docs[index - 1].get('name') == channelName && snapshot.data!.docs[index - 1].get('group') == selectedGroupID)
+                                                                        ? Colors.white
+                                                                        : Colors.grey),
                                                               ),
                                                             ),
                                                             style: ButtonStyle(
@@ -267,7 +251,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ],
                     ),
                   )
-                : MembersScreen(groupID: groupID, numberMembers: numberMembers),
+                : MembersScreen(groupID: groupID, groupName: groupName, numberMembers: numberMembers),
           ),
           AnimatedPositioned(
             duration: duration,
@@ -326,25 +310,32 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               ),
                             ),
                           ),
-                          Icon(Icons.attach_file, color: Colors.white),
-                          SizedBox(width: 20),
-                          Icon(Icons.assignment, color: Colors.white),
-                          SizedBox(width: 20),
                           IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  if (isLeftCollapsed) {
-                                    _pageController.forward();
-                                    _bottomNavController.forward();
-                                  } else {
-                                    _pageController.reverse();
-                                    _bottomNavController.reverse();
-                                  }
-                                  isRightCollapsed = !isRightCollapsed;
-                                  previousWidget = 'right';
-                                });
-                              },
-                              icon: Icon(Icons.people, color: Colors.white)),
+                            onPressed: () {},
+                            icon: Icon(Icons.attach_file, color: Colors.white),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => AddAssignmentScreen()));
+                            },
+                            icon: Icon(Icons.assignment, color: Colors.white),
+                          ),
+                          if (groupName != 'Notifications')
+                            IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    if (isLeftCollapsed) {
+                                      _pageController.forward();
+                                      _bottomNavController.forward();
+                                    } else {
+                                      _pageController.reverse();
+                                      _bottomNavController.reverse();
+                                    }
+                                    isRightCollapsed = !isRightCollapsed;
+                                    previousWidget = 'right';
+                                  });
+                                },
+                                icon: Icon(Icons.people, color: Colors.white)),
                         ],
                       ),
                     ),

@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/components/submit_button.dart';
-import 'package:flutter_assignme/screens/components/text_input.dart';
+import 'package:flutter_assignme/screens/components/icon_text_input.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class CreateGroupScreen extends StatefulWidget {
@@ -94,7 +94,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                       ),
                     ),
                     SizedBox(height: 30),
-                    TextInput(
+                    IconTextInput(
                       controller: groupNameController,
                       obscureText: false,
                       icon: 'group',

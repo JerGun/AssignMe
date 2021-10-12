@@ -19,7 +19,7 @@ class ManageMembersOption extends StatelessWidget {
     return Container(
       height: 50,
       child: TextButton(
-        onPressed: () {},
+        onPressed: onPressed,
         style: ButtonStyle(splashFactory: NoSplash.splashFactory),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 10),
