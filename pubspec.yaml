@@ -38,6 +38,8 @@ dependencies:
   flutter_rounded_date_picker: ^2.0.2
   file_picker: ^4.1.4
   firebase_storage: ^10.0.5
+  open_file: ^3.2.1
+  firebase_app_check: ^0.0.2+2
 
 
 dev_dependencies:

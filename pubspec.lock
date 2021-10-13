@@ -92,6 +92,27 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.1.4"
+  firebase_app_check:
+    dependency: "direct main"
+    description:
+      name: firebase_app_check
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.2+2"
+  firebase_app_check_platform_interface:
+    dependency: transitive
+    description:
+      name: firebase_app_check_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.1+6"
+  firebase_app_check_web:
+    dependency: transitive
+    description:
+      name: firebase_app_check_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.1+6"
   firebase_auth:
     dependency: "direct main"
     description:
@@ -268,6 +289,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
+  open_file:
+    dependency: "direct main"
+    description:
+      name: open_file
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.2.1"
   path:
     dependency: transitive
     description:
