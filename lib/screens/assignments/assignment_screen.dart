@@ -194,46 +194,56 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
                   ),
                   SizedBox(height: 5),
                   Container(
-                    height: 50.0 * files.length,
+                    height: 55.0 * files.length,
                     child: ListView.builder(
                         itemCount: files.length,
                         itemBuilder: (context, index) {
-                          return Container(
-                            height: 50,
-                            child: TextButton(
-                              onPressed: () {
-                                openFile();
-                              },
-                              style: ButtonStyle(splashFactory: NoSplash.splashFactory),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
+                          return Column(
+                            children: [
+                              Container(
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: Colors.grey[700],
+                                ),
+                                child: TextButton(
+                                  onPressed: () {
+                                    openFile();
+                                  },
+                                  style: ButtonStyle(splashFactory: NoSplash.splashFactory),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Icon(Icons.insert_drive_file, color: Colors.white),
-                                      SizedBox(width: 10),
-                                      Text(
-                                        '${files[index]['fileName']}',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                        ),
+                                      Row(
+                                        children: [
+                                          Icon(Icons.insert_drive_file, color: Colors.white),
+                                          SizedBox(width: 10),
+                                          Text(
+                                            '${files[index]['fileName']}',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ],
                                       ),
+                                      IconButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            removeFile(files[index]['url']);
+                                            files.removeAt(index);
+                                          });
+                                        },
+                                        icon: Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
+                                        ),
+                                      )
                                     ],
                                   ),
-                                  IconButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          removeFile(files[index]['url']);
-                                          files.removeAt(index);
-                                        });
-                                      },
-                                      icon: Icon(
-                                        Icons.delete,
-                                        color: Colors.red,
-                                      ))
-                                ],
+                                ),
                               ),
-                            ),
+                              SizedBox(height: 5),
+                            ],
                           );
                         }),
                   ),

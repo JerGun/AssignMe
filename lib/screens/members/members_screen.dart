@@ -96,158 +96,152 @@ class _MembersScreenState extends State<MembersScreen> {
                                                     context: context,
                                                     builder: (BuildContext context) {
                                                       return Container(
-                                                        child: Center(
-                                                            child: Column(
+                                                        width: MediaQuery.of(context).size.width,
+                                                        color: Colors.grey[850],
+                                                        child: Column(
                                                           children: [
                                                             Container(
-                                                              width: MediaQuery.of(context).size.width,
-                                                              color: Colors.grey[850],
+                                                              margin: EdgeInsets.only(top: 40, left: 20, right: 20),
                                                               child: Column(
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                                 children: [
                                                                   Container(
-                                                                    margin: EdgeInsets.only(top: 40, left: 20, right: 20),
-                                                                    child: Column(
-                                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                                      children: [
-                                                                        Container(
-                                                                          width: 80,
-                                                                          height: 80,
-                                                                          decoration: BoxDecoration(
-                                                                            color: Colors.white,
-                                                                            borderRadius: BorderRadius.circular(100),
-                                                                          ),
-                                                                        ),
-                                                                        SizedBox(height: 20),
-                                                                        Row(
-                                                                          children: [
-                                                                            Text(
-                                                                              '${data['firstName']} ${data['lastName']}',
-                                                                              style: TextStyle(
-                                                                                fontSize: 20,
-                                                                                fontWeight: FontWeight.bold,
-                                                                                color: Colors.white,
-                                                                              ),
-                                                                            ),
-                                                                            SizedBox(width: 10),
-                                                                            Text(
-                                                                              '#${data['tag']}',
-                                                                              style: TextStyle(
-                                                                                fontSize: 20,
-                                                                                fontWeight: FontWeight.bold,
-                                                                                color: Colors.grey,
-                                                                              ),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        SizedBox(height: 10),
-                                                                        Text(
-                                                                          data['role'] == 'teacher' ? 'T${data['role'].toString().substring(1)}' : 'S${data['role'].toString().substring(1)}',
-                                                                          style: TextStyle(
-                                                                            fontSize: 20,
-                                                                            fontWeight: FontWeight.bold,
-                                                                            color: Colors.grey,
-                                                                          ),
-                                                                        ),
-                                                                      ],
+                                                                    width: 80,
+                                                                    height: 80,
+                                                                    decoration: BoxDecoration(
+                                                                      color: Colors.white,
+                                                                      borderRadius: BorderRadius.circular(100),
                                                                     ),
                                                                   ),
-                                                                  Padding(
-                                                                    padding: EdgeInsets.all(20),
-                                                                    child: Column(
-                                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                                      children: [
-                                                                        Text(
-                                                                          snapshot.data!.docs[0].get('name'),
-                                                                          style: TextStyle(
-                                                                            color: Colors.grey,
-                                                                          ),
+                                                                  SizedBox(height: 20),
+                                                                  Row(
+                                                                    children: [
+                                                                      Text(
+                                                                        '${data['firstName']} ${data['lastName']}',
+                                                                        style: TextStyle(
+                                                                          fontSize: 20,
+                                                                          fontWeight: FontWeight.bold,
+                                                                          color: Colors.white,
                                                                         ),
-                                                                        SizedBox(height: 10),
-                                                                        Container(
-                                                                          width: MediaQuery.of(context).size.width,
-                                                                          decoration: BoxDecoration(
-                                                                            color: Colors.grey[800],
-                                                                            borderRadius: BorderRadius.circular(10),
-                                                                          ),
-                                                                          child: Column(
-                                                                            children: [
-                                                                              ManageMembersOption(
-                                                                                title: 'Manage User',
-                                                                                icon: Icons.settings,
-                                                                                onPressed: () {},
-                                                                              ),
-                                                                              ManageMembersOption(
-                                                                                title: 'Kick',
-                                                                                icon: Icons.close,
-                                                                                color: Colors.red,
-                                                                                onPressed: () {
-                                                                                  showDialog(
-                                                                                      context: context,
-                                                                                      builder: (context) {
-                                                                                        return AlertDialog(
-                                                                                          title: Text(
-                                                                                            "Kick '${data['firstName']} ${data['lastName']}'",
-                                                                                            style: TextStyle(
-                                                                                              color: Colors.white,
-                                                                                            ),
-                                                                                          ),
-                                                                                          content: Text(
-                                                                                            'Are you sure you want to kick ${data['firstName']} ${data['lastName']}? They will able to rejoin with a new invite',
-                                                                                            style: TextStyle(
-                                                                                              color: Colors.white,
-                                                                                              fontSize: 14,
-                                                                                            ),
-                                                                                          ),
-                                                                                          backgroundColor: Colors.grey[800],
-                                                                                          actions: [
-                                                                                            TextButton(
-                                                                                              onPressed: () {
-                                                                                                Navigator.pop(context);
-                                                                                              },
-                                                                                              child: Text(
-                                                                                                'Cancle',
-                                                                                                style: TextStyle(
-                                                                                                  color: Colors.white,
-                                                                                                ),
-                                                                                              ),
-                                                                                            ),
-                                                                                            Container(
-                                                                                              width: 100,
-                                                                                              height: 40,
-                                                                                              decoration: BoxDecoration(
-                                                                                                color: Colors.red,
-                                                                                                borderRadius: BorderRadius.circular(10),
-                                                                                              ),
-                                                                                              child: TextButton(
-                                                                                                onPressed: () {
-                                                                                                  FirebaseFirestore.instance.collection('groups').doc(snapshot.data!.docs[0].id).update({
-                                                                                                    'members': FieldValue.arrayRemove([data['uid']])
-                                                                                                  }).then((value) => {Navigator.pop(context), Navigator.pop(context)});
-                                                                                                },
-                                                                                                child: Text(
-                                                                                                  'Confirm',
-                                                                                                  style: TextStyle(
-                                                                                                    color: Colors.white,
-                                                                                                  ),
-                                                                                                ),
-                                                                                              ),
-                                                                                            )
-                                                                                          ],
-                                                                                        );
-                                                                                      });
-                                                                                },
-                                                                              ),
-                                                                            ],
-                                                                          ),
-                                                                        )
-                                                                      ],
+                                                                      ),
+                                                                      SizedBox(width: 10),
+                                                                      Text(
+                                                                        '#${data['tag']}',
+                                                                        style: TextStyle(
+                                                                          fontSize: 20,
+                                                                          fontWeight: FontWeight.bold,
+                                                                          color: Colors.grey,
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  SizedBox(height: 10),
+                                                                  Text(
+                                                                    data['role'] == 'teacher' ? 'T${data['role'].toString().substring(1)}' : 'S${data['role'].toString().substring(1)}',
+                                                                    style: TextStyle(
+                                                                      fontSize: 20,
+                                                                      fontWeight: FontWeight.bold,
+                                                                      color: Colors.grey,
                                                                     ),
                                                                   ),
                                                                 ],
                                                               ),
                                                             ),
+                                                            Padding(
+                                                              padding: EdgeInsets.all(20),
+                                                              child: Column(
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                children: [
+                                                                  Text(
+                                                                    snapshot.data!.docs[0].get('groupName'),
+                                                                    style: TextStyle(
+                                                                      color: Colors.grey,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(height: 10),
+                                                                  Container(
+                                                                    width: MediaQuery.of(context).size.width,
+                                                                    decoration: BoxDecoration(
+                                                                      color: Colors.grey[800],
+                                                                      borderRadius: BorderRadius.circular(10),
+                                                                    ),
+                                                                    child: Column(
+                                                                      children: [
+                                                                        ManageMembersOption(
+                                                                          title: 'Manage User',
+                                                                          icon: Icons.settings,
+                                                                          onPressed: () {},
+                                                                        ),
+                                                                        ManageMembersOption(
+                                                                          title: 'Kick',
+                                                                          icon: Icons.close,
+                                                                          color: Colors.red,
+                                                                          onPressed: () {
+                                                                            showDialog(
+                                                                              context: context,
+                                                                              builder: (context) {
+                                                                                return AlertDialog(
+                                                                                  title: Text(
+                                                                                    "Kick '${data['firstName']} ${data['lastName']}'",
+                                                                                    style: TextStyle(
+                                                                                      color: Colors.white,
+                                                                                    ),
+                                                                                  ),
+                                                                                  content: Text(
+                                                                                    'Are you sure you want to kick ${data['firstName']} ${data['lastName']}? They will able to rejoin with a new invite',
+                                                                                    style: TextStyle(
+                                                                                      color: Colors.white,
+                                                                                      fontSize: 14,
+                                                                                    ),
+                                                                                  ),
+                                                                                  backgroundColor: Colors.grey[800],
+                                                                                  actions: [
+                                                                                    TextButton(
+                                                                                      onPressed: () {
+                                                                                        Navigator.pop(context);
+                                                                                      },
+                                                                                      child: Text(
+                                                                                        'Cancle',
+                                                                                        style: TextStyle(
+                                                                                          color: Colors.white,
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                    Container(
+                                                                                      width: 100,
+                                                                                      height: 40,
+                                                                                      decoration: BoxDecoration(
+                                                                                        color: Colors.red,
+                                                                                        borderRadius: BorderRadius.circular(10),
+                                                                                      ),
+                                                                                      child: TextButton(
+                                                                                        onPressed: () {
+                                                                                          FirebaseFirestore.instance.collection('groups').doc(snapshot.data!.docs[0].id).update({
+                                                                                            'members': FieldValue.arrayRemove([data['uid']])
+                                                                                          }).then((value) => {Navigator.pop(context), Navigator.pop(context)});
+                                                                                        },
+                                                                                        child: Text(
+                                                                                          'Confirm',
+                                                                                          style: TextStyle(
+                                                                                            color: Colors.white,
+                                                                                          ),
+                                                                                        ),
+                                                                                      ),
+                                                                                    )
+                                                                                  ],
+                                                                                );
+                                                                              },
+                                                                            );
+                                                                          },
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            ),
                                                           ],
-                                                        )),
+                                                        ),
                                                       );
                                                     },
                                                   );

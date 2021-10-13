@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/assignments/add_assignment_screen.dart';
 import 'package:flutter_assignme/screens/home/components/create_group_button.dart';
 import 'package:flutter_assignme/screens/home/components/home.dart';
+import 'package:flutter_assignme/screens/members/components/manage_member_option.dart';
 import 'package:flutter_assignme/screens/members/members_screen.dart';
 import 'package:flutter_assignme/screens/notifications/components/notifications_button.dart';
 import 'package:flutter_assignme/screens/home/components/group_button.dart';
@@ -46,6 +47,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+    });
+  }
+
+  Future deleteGroup() async {
+    FirebaseFirestore.instance.collection('groups').doc(gid).delete();
+    CollectionReference collection = FirebaseFirestore.instance.collection('channels');
+    await collection
+        .where('gid', isEqualTo: gid)
+        .get()
+        .then((value) => {
+              print(value.docs),
+              for (QueryDocumentSnapshot snapshot in value.docs) {FirebaseFirestore.instance.collection('channels').doc(snapshot.id).delete()}
+            })
+        .then((value) => {Navigator.pop(context), Navigator.pop(context)});
+
+    setState(() {
+      groupName = 'Notifications';
     });
   }
 
@@ -93,6 +111,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     itemBuilder: (context, index) {
                                       return index == 0
                                           ? NotificationButton(
+                                              groupName: groupName,
                                               groupSelectedIndex: groupSelectedIndex,
                                               index: index,
                                               onPressed: () {
@@ -157,20 +176,128 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                   context: context,
                                                   builder: (BuildContext context) {
                                                     return Container(
-                                                      height: 200,
-                                                      color: Colors.amber,
-                                                      child: Center(
-                                                        child: Column(
-                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          children: <Widget>[
-                                                            const Text('Modal BottomSheet'),
-                                                            ElevatedButton(
-                                                              child: const Text('Close BottomSheet'),
-                                                              onPressed: () => Navigator.pop(context),
-                                                            )
-                                                          ],
-                                                        ),
+                                                      width: MediaQuery.of(context).size.width,
+                                                      color: Colors.grey[850],
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Container(
+                                                            margin: EdgeInsets.only(top: 40, left: 20, right: 20),
+                                                            child: Column(
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                              children: [
+                                                                Container(
+                                                                  width: 80,
+                                                                  height: 80,
+                                                                  decoration: BoxDecoration(
+                                                                    color: Colors.white,
+                                                                    borderRadius: BorderRadius.circular(100),
+                                                                  ),
+                                                                ),
+                                                                SizedBox(height: 20),
+                                                                Text(
+                                                                  groupName,
+                                                                  style: TextStyle(
+                                                                    fontSize: 20,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    color: Colors.white,
+                                                                  ),
+                                                                ),
+                                                                SizedBox(height: 10),
+                                                                Text(
+                                                                  '${numberMembers.toString()} Members',
+                                                                  style: TextStyle(
+                                                                    color: Colors.grey,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding: EdgeInsets.all(20),
+                                                            child: Column(
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                              children: [
+                                                                Container(
+                                                                  width: MediaQuery.of(context).size.width,
+                                                                  decoration: BoxDecoration(
+                                                                    color: Colors.grey[800],
+                                                                    borderRadius: BorderRadius.circular(10),
+                                                                  ),
+                                                                  child: Column(
+                                                                    children: [
+                                                                      ManageMembersOption(
+                                                                        title: 'Group Settings',
+                                                                        icon: Icons.settings,
+                                                                        onPressed: () {},
+                                                                      ),
+                                                                      ManageMembersOption(
+                                                                        title: 'Delete Group',
+                                                                        icon: Icons.close,
+                                                                        color: Colors.red,
+                                                                        onPressed: () {
+                                                                          showDialog(
+                                                                            context: context,
+                                                                            builder: (context) {
+                                                                              return AlertDialog(
+                                                                                title: Text(
+                                                                                  "Delete '$groupName'",
+                                                                                  style: TextStyle(
+                                                                                    color: Colors.white,
+                                                                                  ),
+                                                                                ),
+                                                                                content: Text(
+                                                                                  'Are you sure you want to delete $groupName? \nThis action cannot be undone.',
+                                                                                  style: TextStyle(
+                                                                                    color: Colors.white,
+                                                                                    fontSize: 14,
+                                                                                  ),
+                                                                                ),
+                                                                                backgroundColor: Colors.grey[800],
+                                                                                actions: [
+                                                                                  TextButton(
+                                                                                    onPressed: () {
+                                                                                      Navigator.pop(context);
+                                                                                    },
+                                                                                    child: Text(
+                                                                                      'Cancle',
+                                                                                      style: TextStyle(
+                                                                                        color: Colors.white,
+                                                                                      ),
+                                                                                    ),
+                                                                                  ),
+                                                                                  Container(
+                                                                                    width: 100,
+                                                                                    height: 40,
+                                                                                    decoration: BoxDecoration(
+                                                                                      color: Colors.red,
+                                                                                      borderRadius: BorderRadius.circular(10),
+                                                                                    ),
+                                                                                    child: TextButton(
+                                                                                      onPressed: () async {
+                                                                                        deleteGroup();
+                                                                                      },
+                                                                                      child: Text(
+                                                                                        'Confirm',
+                                                                                        style: TextStyle(
+                                                                                          color: Colors.white,
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                  )
+                                                                                ],
+                                                                              );
+                                                                            },
+                                                                          );
+                                                                        },
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     );
                                                   },
