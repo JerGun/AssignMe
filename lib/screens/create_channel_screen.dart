@@ -50,7 +50,7 @@ class _CreateChannelScreenState extends State<CreateChannelScreen> {
             'Create Channel',
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 18,
+              fontSize: 16,
             ),
           ),
           backgroundColor: Colors.grey[900],

@@ -50,7 +50,20 @@ class _HomeState extends State<Home> {
                           ),
                           child: TextButton(
                             onPressed: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => AssignmentScreen()));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => AssignmentScreen(
+                                            gid: snapshot.data!.docs[index].get('gid'),
+                                            groupName: snapshot.data!.docs[index].get('groupName'),
+                                            cid: snapshot.data!.docs[index].get('cid'),
+                                            channelName: snapshot.data!.docs[index].get('channelName'),
+                                            title: snapshot.data!.docs[index].get('title'),
+                                            descriptions: snapshot.data!.docs[index].get('descriptions'),
+                                            points: snapshot.data!.docs[index].get('points'),
+                                            dateDue: snapshot.data!.docs[index].get('dateDue'),
+                                            timeDue: snapshot.data!.docs[index].get('timeDue'),
+                                          )));
                             },
                             style: ButtonStyle(splashFactory: NoSplash.splashFactory),
                             child: Container(
@@ -59,9 +72,15 @@ class _HomeState extends State<Home> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    snapshot.data!.docs[index].get('groupName'),
-                                    style: TextStyle(color: Colors.white, fontSize: 16),
+                                  Container(
+                                    width: MediaQuery.of(context).size.width * 0.9,
+                                    child: Expanded(
+                                      child: Text(
+                                        '${snapshot.data!.docs[index].get('groupName')} | ${snapshot.data!.docs[index].get('channelName')}',
+                                        style: TextStyle(color: Colors.white, fontSize: 16),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
                                   ),
                                   SizedBox(height: 10),
                                   Text(

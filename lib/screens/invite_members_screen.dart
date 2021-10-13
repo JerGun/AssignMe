@@ -52,7 +52,7 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
           'Invite Members',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: 16,
           ),
         ),
         backgroundColor: Colors.grey[900],
