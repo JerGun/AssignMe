@@ -15,8 +15,8 @@ class CreateGroupButton extends StatelessWidget {
           width: 55,
           height: 55,
           child: ElevatedButton(
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async{
+              final result = await Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => CreateGroupScreen()),
               );

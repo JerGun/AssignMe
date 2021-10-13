@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ManageMembersOption extends StatelessWidget {
-  const ManageMembersOption({
+class SettingsOption extends StatelessWidget {
+  const SettingsOption({
     Key? key,
     required this.title,
     required this.icon,

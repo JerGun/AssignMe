@@ -2,19 +2,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/components/behavior.dart';
-import 'package:flutter_assignme/screens/members/components/manage_member_option.dart';
+import 'package:flutter_assignme/screens/components/settings_option.dart';
 
 class MembersScreen extends StatefulWidget {
   const MembersScreen({
     Key? key,
     required this.gid,
-    required this.numberMembers,
     required this.groupName,
   }) : super(key: key);
 
   final String gid;
   final String groupName;
-  final int numberMembers;
 
   @override
   _MembersScreenState createState() => _MembersScreenState();
@@ -25,9 +23,16 @@ class _MembersScreenState extends State<MembersScreen> {
 
   double? topPadding;
 
+  Future kickMember(String docID, String uid) async {
+    FirebaseFirestore.instance.collection('groups').doc(docID).update({
+      'members': FieldValue.arrayRemove([uid])
+    }).then((value) => {Navigator.pop(context), Navigator.pop(context)});
+  }
+
   @override
   Widget build(BuildContext context) {
     topPadding = MediaQuery.of(context).padding.top;
+
     if (widget.groupName != 'Notification')
       return Container(
         width: MediaQuery.of(context).size.width,
@@ -39,43 +44,43 @@ class _MembersScreenState extends State<MembersScreen> {
             width: MediaQuery.of(context).size.width * 0.825,
             height: MediaQuery.of(context).size.height,
             color: Colors.grey[850],
-            child: Padding(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'MEMBERS — ',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontWeight: FontWeight.bold,
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance.collection('groups').where('gid', isEqualTo: widget.gid).snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else {
+                  var members = snapshot.data!.docs[0].get('members');
+                  return Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              'MEMBERS — ',
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              members.length.toString(),
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      Text(
-                        widget.numberMembers.toString(),
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: ScrollConfiguration(
-                        behavior: Behavior(),
-                        child: StreamBuilder<QuerySnapshot>(
-                          stream: FirebaseFirestore.instance.collection('groups').where('gid', isEqualTo: widget.gid).snapshots(),
-                          builder: (context, snapshot) {
-                            if (!snapshot.hasData) {
-                              return Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            } else {
-                              var members = snapshot.data!.docs[0].get('members');
-                              return ListView.builder(
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(top: 20),
+                            child: ScrollConfiguration(
+                              behavior: Behavior(),
+                              child: ListView.builder(
                                 itemCount: members.length,
                                 itemBuilder: (context, index) {
                                   return FutureBuilder<DocumentSnapshot>(
@@ -167,12 +172,12 @@ class _MembersScreenState extends State<MembersScreen> {
                                                                     ),
                                                                     child: Column(
                                                                       children: [
-                                                                        ManageMembersOption(
+                                                                        SettingsOption(
                                                                           title: 'Manage User',
                                                                           icon: Icons.settings,
                                                                           onPressed: () {},
                                                                         ),
-                                                                        ManageMembersOption(
+                                                                        SettingsOption(
                                                                           title: 'Kick',
                                                                           icon: Icons.close,
                                                                           color: Colors.red,
@@ -216,9 +221,7 @@ class _MembersScreenState extends State<MembersScreen> {
                                                                                       ),
                                                                                       child: TextButton(
                                                                                         onPressed: () {
-                                                                                          FirebaseFirestore.instance.collection('groups').doc(snapshot.data!.docs[0].id).update({
-                                                                                            'members': FieldValue.arrayRemove([data['uid']])
-                                                                                          }).then((value) => {Navigator.pop(context), Navigator.pop(context)});
+                                                                                          kickMember(snapshot.data!.docs[0].id, data['uid']);
                                                                                         },
                                                                                         child: Text(
                                                                                           'Confirm',
@@ -249,10 +252,9 @@ class _MembersScreenState extends State<MembersScreen> {
                                               style: ButtonStyle(splashFactory: NoSplash.splashFactory),
                                               child: Row(
                                                 children: [
-                                                  Container(
-                                                    width: 40,
-                                                    height: 40,
-                                                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: Colors.grey),
+                                                  CircleAvatar(
+                                                    radius: 20,
+                                                    backgroundImage: NetworkImage('${data['img']}'),
                                                   ),
                                                   SizedBox(width: 10),
                                                   Text(
@@ -271,15 +273,15 @@ class _MembersScreenState extends State<MembersScreen> {
                                     },
                                   );
                                 },
-                              );
-                            }
-                          },
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
+                  );
+                }
+              },
             ),
           ),
         ),

@@ -43,7 +43,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       });
       FirebaseFirestore.instance.collection('channels').doc(channelDoc.id).update({
         'cid': channelDoc.id,
-      }).then((value) => Navigator.pop(context));
+      }).then((value) => Navigator.pop(context, [groupDoc.id, groupNameController.text]));
     }
   }
 

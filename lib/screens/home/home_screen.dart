@@ -2,14 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/assignments/add_assignment_screen.dart';
-import 'package:flutter_assignme/screens/home/components/create_group_button.dart';
 import 'package:flutter_assignme/screens/home/components/home.dart';
-import 'package:flutter_assignme/screens/members/components/manage_member_option.dart';
+import 'package:flutter_assignme/screens/components/settings_option.dart';
 import 'package:flutter_assignme/screens/members/members_screen.dart';
 import 'package:flutter_assignme/screens/notifications/components/notifications_button.dart';
 import 'package:flutter_assignme/screens/home/components/group_button.dart';
 import 'package:flutter_assignme/screens/profile_screen.dart';
 import '../components/behavior.dart';
+import '../create_group_screen.dart';
 import 'components/channel_option_button.dart';
 import '../notifications/notifications_screen.dart';
 
@@ -64,6 +64,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     setState(() {
       groupName = 'Notifications';
+      groupSelectedIndex = 0;
     });
   }
 
@@ -122,7 +123,39 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                 });
                                               })
                                           : index == snapshot.data!.docs.length + 1
-                                              ? CreateGroupButton()
+                                              ? Column(
+                                                  children: [
+                                                    Container(
+                                                      width: 55,
+                                                      height: 55,
+                                                      child: ElevatedButton(
+                                                        onPressed: () async {
+                                                          final result = await Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(builder: (context) => CreateGroupScreen()),
+                                                          );
+                                                          setState(() {
+                                                            if (result != null) {
+                                                              gid = result[0];
+                                                              groupName = result[1];
+                                                              groupSelectedIndex = 1;
+                                                            }
+                                                          });
+                                                        },
+                                                        style: ElevatedButton.styleFrom(
+                                                            shape: new RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.circular(40),
+                                                            ),
+                                                            primary: Colors.grey[800]),
+                                                        child: Icon(
+                                                          Icons.add,
+                                                          color: Colors.yellow,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(height: 10),
+                                                  ],
+                                                )
                                               : GroupButton(
                                                   groupSelectedIndex: groupSelectedIndex,
                                                   index: index,
@@ -226,12 +259,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                                   ),
                                                                   child: Column(
                                                                     children: [
-                                                                      ManageMembersOption(
+                                                                      SettingsOption(
                                                                         title: 'Group Settings',
                                                                         icon: Icons.settings,
                                                                         onPressed: () {},
                                                                       ),
-                                                                      ManageMembersOption(
+                                                                      SettingsOption(
                                                                         title: 'Delete Group',
                                                                         icon: Icons.close,
                                                                         color: Colors.red,
@@ -379,7 +412,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ],
                     ),
                   )
-                : MembersScreen(gid: gid, groupName: groupName, numberMembers: numberMembers),
+                : MembersScreen(gid: gid, groupName: groupName),
           ),
           AnimatedPositioned(
             duration: duration,
@@ -522,7 +555,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           child: Wrap(
             children: [
               FloatingActionButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => AddAssignmentScreen(gid: gid, groupName: groupName, cid: cid, channelName: channelName)));
+                },
                 child: Icon(
                   Icons.add,
                   color: isLeftCollapsed && isRightCollapsed ? Colors.grey[850] : Colors.transparent,

@@ -53,7 +53,7 @@ class SignInScreen extends StatelessWidget {
                             Padding(
                               padding: EdgeInsets.only(left: 10),
                               child: Text(
-                                'PLease sign in to continue.',
+                                'Please sign in to continue.',
                                 style: TextStyle(fontSize: 16, color: Colors.white),
                               ),
                             ),

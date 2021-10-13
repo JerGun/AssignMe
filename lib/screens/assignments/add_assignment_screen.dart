@@ -3,7 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/components/behavior.dart';
 import 'package:flutter_assignme/screens/components/text_input.dart';
+import 'package:flutter_assignme/screens/components/toast.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 
 class AddAssignmentScreen extends StatefulWidget {
@@ -30,25 +32,65 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
   final TextEditingController pointsController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
+  late FToast fToast;
 
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay(hour: 00, minute: 00);
   User? user = FirebaseAuth.instance.currentUser;
 
   Future addAssignments() async {
-    DocumentReference assignmentDoc = await FirebaseFirestore.instance.collection('assignments').add({
-      'gid': widget.gid,
-      'groupName': widget.groupName,
-      'cid': widget.cid,
-      'channelName': widget.channelName,
-      'title': titleController.text,
-      'descriptions': descriptionsController.text,
-      'points': num.parse(pointsController.text),
-      'dateDue': dateController.text,
-      'timeDue': timeController.text,
-      'assigner': user!.uid,
-    });
-    FirebaseFirestore.instance.collection('assignments').doc(assignmentDoc.id).update({'aid': assignmentDoc.id})..then((value) => Navigator.pop(context));
+    if (titleController.text.isEmpty)
+      fToast.showToast(
+        child: toast('Title is required.'),
+        gravity: ToastGravity.BOTTOM,
+        toastDuration: Duration(seconds: 2),
+      );
+    else if (descriptionsController.text.isEmpty)
+      fToast.showToast(
+        child: toast('Descriptions is required.'),
+        gravity: ToastGravity.BOTTOM,
+        toastDuration: Duration(seconds: 2),
+      );
+    else if (pointsController.text.isEmpty)
+      fToast.showToast(
+        child: toast('Points is required.'),
+        gravity: ToastGravity.BOTTOM,
+        toastDuration: Duration(seconds: 2),
+      );
+    else if (dateController.text.isEmpty)
+      fToast.showToast(
+        child: toast('Date due is required.'),
+        gravity: ToastGravity.BOTTOM,
+        toastDuration: Duration(seconds: 2),
+      );
+    else if (timeController.text.isEmpty)
+      fToast.showToast(
+        child: toast('Time due is required.'),
+        gravity: ToastGravity.BOTTOM,
+        toastDuration: Duration(seconds: 2),
+      );
+    else {
+      DocumentReference assignmentDoc = await FirebaseFirestore.instance.collection('assignments').add({
+        'gid': widget.gid,
+        'groupName': widget.groupName,
+        'cid': widget.cid,
+        'channelName': widget.channelName,
+        'title': titleController.text,
+        'descriptions': descriptionsController.text,
+        'points': num.parse(pointsController.text),
+        'dateDue': dateController.text,
+        'timeDue': timeController.text,
+        'assigner': user!.uid,
+      });
+      FirebaseFirestore.instance.collection('assignments').doc(assignmentDoc.id).update({'aid': assignmentDoc.id})..then((value) => Navigator.pop(context));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fToast = FToast();
+    fToast.init(context);
   }
 
   @override
