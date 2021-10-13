@@ -7,11 +7,11 @@ import 'components/behavior.dart';
 class InviteMemberScreen extends StatefulWidget {
   const InviteMemberScreen({
     Key? key,
-    required this.groupID,
+    required this.gid,
     required this.groupName,
   }) : super(key: key);
 
-  final String groupID;
+  final String gid;
   final String groupName;
 
   @override
@@ -26,7 +26,7 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
   Future inviteMember(String inviteeID) async {
     if (inviteeID != user!.uid) {
       FirebaseFirestore.instance.collection('invites').add({
-        'gid': widget.groupID,
+        'gid': widget.gid,
         'groupName': widget.groupName,
         'invitee': inviteeID,
         'inviter': user!.uid,

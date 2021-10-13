@@ -5,10 +5,14 @@ class TextInput extends StatefulWidget {
     Key? key,
     required this.controller,
     required this.hint,
+    this.enabled = true,
+    this.textInputType = TextInputType.text,
   }) : super(key: key);
 
   final TextEditingController controller;
   final String hint;
+  final bool enabled;
+  final textInputType;
 
   @override
   _TextInputState createState() => _TextInputState();
@@ -24,6 +28,7 @@ class _TextInputState extends State<TextInput> {
     return Container(
       width: MediaQuery.of(context).size.width * 0.8,
       height: heightOfContainer,
+      constraints: BoxConstraints(maxHeight: 200),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         color: isFocus ? Colors.grey[700] : Colors.grey[850],
@@ -59,6 +64,8 @@ class _TextInputState extends State<TextInput> {
                 hintText: widget.hint,
                 hintStyle: TextStyle(color: isFocus ? Colors.white : Colors.grey),
               ),
+              enabled: widget.enabled,
+              keyboardType: widget.textInputType,
               style: TextStyle(color: Colors.white),
               maxLines: null,
             ),

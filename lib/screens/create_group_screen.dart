@@ -27,96 +27,103 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     } else {
       DocumentReference groupDoc = await FirebaseFirestore.instance.collection('groups').add({
         'owners': user!.uid,
-        'name': groupNameController.text,
+        'groupName': groupNameController.text,
         'members': FieldValue.arrayUnion([user.uid]),
       });
       FirebaseFirestore.instance.collection('groups').doc(groupDoc.id).update({
         'gid': groupDoc.id,
       });
-      FirebaseFirestore.instance.collection('channels').add({
-        'group': groupDoc.id,
-        'name': 'General',
+      DocumentReference channelDoc = await FirebaseFirestore.instance.collection('channels').add({
+        'gid': groupDoc.id,
+        'groupName': groupNameController.text,
+        'channelName': 'General',
+      });
+      FirebaseFirestore.instance.collection('channels').doc(channelDoc.id).update({
+        'cid': channelDoc.id,
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Container(
-      color: Colors.grey[900],
-      child: SafeArea(
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          color: Colors.grey[850],
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Scaffold(
+          body: Container(
+        color: Colors.grey[900],
+        child: SafeArea(
           child: Container(
-            width: MediaQuery.of(context).size.width * 0.8,
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Container(
-                    margin: EdgeInsets.only(top: 20, left: 20),
-                    child: TextButton(
-                      onPressed: () {
-                        Fluttertoast.cancel();
-                        Navigator.pop(context);
-                      },
-                      style: ButtonStyle(
-                        splashFactory: NoSplash.splashFactory,
-                      ),
-                      child: Icon(
-                        Icons.close,
-                        color: Colors.white,
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            color: Colors.grey[850],
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.8,
+              child: Column(
+                children: [
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Container(
+                      margin: EdgeInsets.only(top: 20, left: 20),
+                      child: TextButton(
+                        onPressed: () {
+                          Fluttertoast.cancel();
+                          Navigator.pop(context);
+                        },
+                        style: ButtonStyle(
+                          splashFactory: NoSplash.splashFactory,
+                        ),
+                        child: Icon(
+                          Icons.close,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Create Your Group',
-                      textAlign: TextAlign.left,
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Create Your Group',
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 10),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.75,
-                      child: Text(
-                        'Teachers are owners of class groups and students participate as members.',
-                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      SizedBox(height: 10),
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.75,
+                        child: Text(
+                          'Teachers are owners of class groups and students participate as members.',
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 30),
-                    IconTextInput(
-                      controller: groupNameController,
-                      obscureText: false,
-                      icon: 'group',
-                      hint: 'Group name',
-                      clear: true,
-                    ),
-                    SizedBox(height: 30),
-                  ],
-                ),
-                SubmitButton(
-                    title: 'Create Group',
-                    onPressed: () async {
-                      createGroup().then((value) => {
-                            Fluttertoast.cancel(),
-                            Navigator.pop(context),
-                          });
-                    }),
-              ],
+                      SizedBox(height: 30),
+                      IconTextInput(
+                        controller: groupNameController,
+                        obscureText: false,
+                        icon: 'group',
+                        hint: 'Group name',
+                        clear: true,
+                      ),
+                      SizedBox(height: 30),
+                    ],
+                  ),
+                  SubmitButton(
+                      title: 'Create Group',
+                      onPressed: () async {
+                        createGroup().then((value) => {
+                              Fluttertoast.cancel(),
+                              Navigator.pop(context),
+                            });
+                      }),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    ));
+      )),
+    );
   }
 }

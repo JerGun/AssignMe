@@ -6,11 +6,11 @@ import '../../create_channel_screen.dart';
 class ChannelOptionButton extends StatelessWidget {
   const ChannelOptionButton({
     Key? key,
-    required this.groupID,
+    required this.gid,
     required this.groupName,
   }) : super(key: key);
 
-  final String groupID;
+  final String gid;
   final String groupName;
 
   @override
@@ -39,7 +39,7 @@ class ChannelOptionButton extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                     builder: (context) => InviteMemberScreen(
-                          groupID: groupID,
+                          gid: gid,
                           groupName: groupName,
                         )),
               );
@@ -74,7 +74,11 @@ class ChannelOptionButton extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => CreateChannelScreen(groupID: groupID)),
+                    MaterialPageRoute(
+                        builder: (context) => CreateChannelScreen(
+                              gid: gid,
+                              groupName: groupName,
+                            )),
                   );
                 },
                 icon: Icon(

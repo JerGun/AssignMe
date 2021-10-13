@@ -7,12 +7,12 @@ import 'package:flutter_assignme/screens/members/components/manage_member_option
 class MembersScreen extends StatefulWidget {
   const MembersScreen({
     Key? key,
-    required this.groupID,
+    required this.gid,
     required this.numberMembers,
     required this.groupName,
   }) : super(key: key);
 
-  final String groupID;
+  final String gid;
   final String groupName;
   final int numberMembers;
 
@@ -67,7 +67,7 @@ class _MembersScreenState extends State<MembersScreen> {
                       child: ScrollConfiguration(
                         behavior: Behavior(),
                         child: StreamBuilder<QuerySnapshot>(
-                          stream: FirebaseFirestore.instance.collection('groups').where('gid', isEqualTo: widget.groupID).snapshots(),
+                          stream: FirebaseFirestore.instance.collection('groups').where('gid', isEqualTo: widget.gid).snapshots(),
                           builder: (context, snapshot) {
                             if (!snapshot.hasData) {
                               return Center(

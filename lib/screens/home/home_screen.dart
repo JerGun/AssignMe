@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/assignments/add_assignment_screen.dart';
-import 'package:flutter_assignme/screens/create_message_screen.dart';
 import 'package:flutter_assignme/screens/home/components/create_group_button.dart';
+import 'package:flutter_assignme/screens/home/components/main.dart';
 import 'package:flutter_assignme/screens/members/members_screen.dart';
 import 'package:flutter_assignme/screens/notifications/components/notifications_button.dart';
 import 'package:flutter_assignme/screens/home/components/group_button.dart';
@@ -32,10 +32,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   int _selectedIndex = 0;
   int groupSelectedIndex = 0;
+  String gid = '';
   String groupName = 'Notifications';
-  String channelName = 'General';
+  String cid = '';
+  String channelName = 'Welcome to AssignMe';
   String selectedGroupID = '';
-  String groupID = '';
   bool isLeftCollapsed = true;
   bool isRightCollapsed = true;
   String previousWidget = 'mid';
@@ -101,6 +102,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                 setState(() {
                                                   groupSelectedIndex = index;
                                                   groupName = 'Notifications';
+                                                  channelName = 'Welcome to AssignMe';
                                                 });
                                               })
                                           : index == snapshot.data!.docs.length + 1
@@ -111,8 +113,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                   onPressed: () {
                                                     setState(() {
                                                       groupSelectedIndex = index;
-                                                      groupName = snapshot.data!.docs[index - 1].get('name');
-                                                      groupID = snapshot.data!.docs[index - 1].get('gid');
+                                                      groupName = snapshot.data!.docs[index - 1].get('groupName');
+                                                      gid = snapshot.data!.docs[index - 1].get('gid');
                                                       numberMembers = snapshot.data!.docs[index - 1].get('members').length;
                                                     });
                                                   },
@@ -190,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                       child: ScrollConfiguration(
                                         behavior: Behavior(),
                                         child: StreamBuilder<QuerySnapshot>(
-                                          stream: FirebaseFirestore.instance.collection('channels').where('group', isEqualTo: groupID).snapshots(),
+                                          stream: FirebaseFirestore.instance.collection('channels').where('gid', isEqualTo: gid).snapshots(),
                                           builder: (context, snapshot) {
                                             if (!snapshot.hasData) {
                                               return Center(
@@ -202,14 +204,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                 itemBuilder: (context, index) {
                                                   return index == 0
                                                       ? ChannelOptionButton(
-                                                          groupID: groupID,
+                                                          gid: gid,
                                                           groupName: groupName,
                                                         )
                                                       : Container(
                                                           margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                                                           decoration: BoxDecoration(
                                                             borderRadius: BorderRadius.circular(5),
-                                                            color: (snapshot.data!.docs[index - 1].get('name') == channelName && snapshot.data!.docs[index - 1].get('group') == selectedGroupID)
+                                                            color: (snapshot.data!.docs[index - 1].get('channelName') == channelName && snapshot.data!.docs[index - 1].get('gid') == selectedGroupID)
                                                                 ? Colors.grey[700]
                                                                 : Colors.grey[850],
                                                           ),
@@ -217,17 +219,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                           child: TextButton(
                                                             onPressed: () {
                                                               setState(() {
-                                                                channelName = snapshot.data!.docs[index - 1].get('name');
-                                                                selectedGroupID = snapshot.data!.docs[index - 1].get('group');
+                                                                cid = snapshot.data!.docs[index - 1].get('cid');
+                                                                channelName = snapshot.data!.docs[index - 1].get('channelName');
+                                                                selectedGroupID = snapshot.data!.docs[index - 1].get('gid');
                                                                 isLeftCollapsed = !isLeftCollapsed;
                                                               });
                                                             },
                                                             child: Align(
                                                               alignment: Alignment.centerLeft,
                                                               child: Text(
-                                                                snapshot.data!.docs[index - 1].get('name'),
+                                                                snapshot.data!.docs[index - 1].get('channelName'),
                                                                 style: TextStyle(
-                                                                    color: (snapshot.data!.docs[index - 1].get('name') == channelName && snapshot.data!.docs[index - 1].get('group') == selectedGroupID)
+                                                                    color: (snapshot.data!.docs[index - 1].get('channelName') == channelName &&
+                                                                            snapshot.data!.docs[index - 1].get('gid') == selectedGroupID)
                                                                         ? Colors.white
                                                                         : Colors.grey),
                                                               ),
@@ -251,7 +255,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ],
                     ),
                   )
-                : MembersScreen(groupID: groupID, groupName: groupName, numberMembers: numberMembers),
+                : MembersScreen(gid: gid, groupName: groupName, numberMembers: numberMembers),
           ),
           AnimatedPositioned(
             duration: duration,
@@ -310,16 +314,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               ),
                             ),
                           ),
-                          IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.attach_file, color: Colors.white),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => AddAssignmentScreen()));
-                            },
-                            icon: Icon(Icons.assignment, color: Colors.white),
-                          ),
+                          if (groupName != 'Notifications')
+                            IconButton(
+                              onPressed: () {},
+                              icon: Icon(Icons.attach_file, color: Colors.white),
+                            ),
+                          if (groupName != 'Notifications')
+                            IconButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => AddAssignmentScreen(
+                                              gid: gid,
+                                              groupName: groupName,
+                                              cid: cid,
+                                              channelName: channelName,
+                                            )));
+                              },
+                              icon: Icon(Icons.assignment, color: Colors.white),
+                            ),
                           if (groupName != 'Notifications')
                             IconButton(
                                 onPressed: () {
@@ -340,13 +354,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
-                  Text("HOME"),
-                  TextButton(
-                    onPressed: () {
-                      context.read<AuthenticationService>().signOutWithGoogle();
-                    },
-                    child: Text("Sign out"),
-                  ),
+                  Main()
                 ],
               ),
             ),
@@ -362,6 +370,34 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       body: Container(
         color: Colors.grey[900],
         child: SafeArea(child: _children[_selectedIndex]),
+      ),
+      floatingActionButton: Theme(
+        data: ThemeData(
+          splashColor: Colors.transparent,
+        ),
+        child: AnimatedBuilder(
+          animation: _bottomNavController,
+          builder: (context, child) {
+            return AnimatedContainer(
+              duration: duration,
+              width: isLeftCollapsed && isRightCollapsed ? 60 : 0,
+              height: isLeftCollapsed && isRightCollapsed ? 60 : 0,
+              child: child,
+            );
+          },
+          child: Wrap(
+            children: [
+              FloatingActionButton(
+                onPressed: () {},
+                child: Icon(
+                  Icons.add,
+                  color: isLeftCollapsed && isRightCollapsed ? Colors.grey[850] : Colors.transparent,
+                ),
+                backgroundColor: Colors.yellow,
+              ),
+            ],
+          ),
+        ),
       ),
       bottomNavigationBar: Theme(
         data: ThemeData(
