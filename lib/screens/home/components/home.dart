@@ -1,16 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_assignme/screens/assignments/assignment_screen.dart';
 import 'package:flutter_assignme/screens/components/behavior.dart';
 
-class Main extends StatefulWidget {
-  const Main({Key? key}) : super(key: key);
+class Home extends StatefulWidget {
+  const Home({Key? key}) : super(key: key);
 
   @override
-  _MainState createState() => _MainState();
+  _HomeState createState() => _HomeState();
 }
 
-class _MainState extends State<Main> {
+class _HomeState extends State<Home> {
   User? user = FirebaseAuth.instance.currentUser;
 
   @override
@@ -38,9 +39,19 @@ class _MainState extends State<Main> {
                           decoration: BoxDecoration(
                             color: Colors.grey[700],
                             borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                spreadRadius: 2,
+                                blurRadius: 3,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
                           ),
                           child: TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => AssignmentScreen()));
+                            },
                             style: ButtonStyle(splashFactory: NoSplash.splashFactory),
                             child: Container(
                               padding: EdgeInsets.all(10),

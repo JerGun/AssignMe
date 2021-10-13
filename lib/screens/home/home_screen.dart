@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/assignments/add_assignment_screen.dart';
 import 'package:flutter_assignme/screens/home/components/create_group_button.dart';
-import 'package:flutter_assignme/screens/home/components/main.dart';
+import 'package:flutter_assignme/screens/home/components/home.dart';
 import 'package:flutter_assignme/screens/members/members_screen.dart';
 import 'package:flutter_assignme/screens/notifications/components/notifications_button.dart';
 import 'package:flutter_assignme/screens/home/components/group_button.dart';
@@ -354,7 +354,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
-                  Main()
+                  Home()
                 ],
               ),
             ),
