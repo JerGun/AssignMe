@@ -48,10 +48,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     IconButton(
                       onPressed: () {
-                        context
-                            .read<AuthenticationService>()
-                            .signOutWithGoogle()
-                            .then((value) => Navigator.pop(context));
+                        context.read<AuthenticationService>().signOutWithGoogle();
                       },
                       icon: Icon(
                         Icons.exit_to_app,
@@ -121,9 +118,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           SizedBox(height: 10),
                           Text(
-                            data['role'] == 'teacher'
-                                ? 'T${data['role'].toString().substring(1)}'
-                                : 'S${data['role'].toString().substring(1)}',
+                            data['role'] == 'teacher' ? 'T${data['role'].toString().substring(1)}' : 'S${data['role'].toString().substring(1)}',
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,

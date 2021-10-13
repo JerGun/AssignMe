@@ -36,7 +36,7 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
   User? user = FirebaseAuth.instance.currentUser;
 
   Future addAssignments() async {
-    FirebaseFirestore.instance.collection('assignments').add({
+    DocumentReference assignmentDoc = await FirebaseFirestore.instance.collection('assignments').add({
       'gid': widget.gid,
       'groupName': widget.groupName,
       'cid': widget.cid,
@@ -47,7 +47,8 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
       'dateDue': dateController.text,
       'timeDue': timeController.text,
       'assigner': user!.uid,
-    }).then((value) => Navigator.pop(context));
+    });
+    FirebaseFirestore.instance.collection('assignments').doc(assignmentDoc.id).update({'aid': assignmentDoc.id})..then((value) => Navigator.pop(context));
   }
 
   @override

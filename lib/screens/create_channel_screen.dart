@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'components/icon_text_input.dart';
+import 'components/toast.dart';
 
 class CreateChannelScreen extends StatefulWidget {
   const CreateChannelScreen({
@@ -20,13 +21,14 @@ class CreateChannelScreen extends StatefulWidget {
 
 class _CreateChannelScreenState extends State<CreateChannelScreen> {
   final TextEditingController channelNameController = TextEditingController();
+  late FToast fToast;
 
   Future createChannel() async {
     if (channelNameController.text.isEmpty) {
-      Fluttertoast.showToast(
-        msg: "Channel name is required.",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
+      fToast.showToast(
+        child: toast('Channel name is required.'),
+        gravity: ToastGravity.BOTTOM,
+        toastDuration: Duration(seconds: 2),
       );
     } else {
       DocumentReference channelDoc = await FirebaseFirestore.instance.collection('channels').add({
@@ -36,8 +38,15 @@ class _CreateChannelScreenState extends State<CreateChannelScreen> {
       });
       FirebaseFirestore.instance.collection('channels').doc(channelDoc.id).update({
         'cid': channelDoc.id,
-      });
+      }).then((value) => Navigator.pop(context));
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fToast = FToast();
+    fToast.init(context);
   }
 
   @override
@@ -57,10 +66,7 @@ class _CreateChannelScreenState extends State<CreateChannelScreen> {
           actions: [
             IconButton(
                 onPressed: () {
-                  createChannel().then((value) => {
-                        Fluttertoast.cancel(),
-                        Navigator.pop(context),
-                      });
+                  createChannel();
                 },
                 icon: Icon(Icons.check)),
           ],

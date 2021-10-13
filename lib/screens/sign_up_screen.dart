@@ -10,6 +10,8 @@ import 'package:flutter_assignme/services/authentication_service.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
+import 'components/toast.dart';
+
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
 
@@ -22,20 +24,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController lastNameController = TextEditingController();
 
   String role = 'teacher';
+  late FToast fToast;
 
   Future signUp() async {
     User? user = FirebaseAuth.instance.currentUser;
+
     firstNameController.text.isEmpty
-        ? Fluttertoast.showToast(
-            msg: "First name is required.",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
+        ? fToast.showToast(
+            child: toast('First name is required.'),
+            gravity: ToastGravity.BOTTOM,
+            toastDuration: Duration(seconds: 2),
           )
         : lastNameController.text.isEmpty
-            ? Fluttertoast.showToast(
-                msg: "Last name is required.",
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.CENTER,
+            ? fToast.showToast(
+                child: toast('Last name is required.'),
+                gravity: ToastGravity.BOTTOM,
+                toastDuration: Duration(seconds: 2),
               )
             : await FirebaseFirestore.instance
                 .collection('users')
@@ -44,6 +48,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       context,
                       MaterialPageRoute(builder: (context) => HomeScreen()),
                     ));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fToast = FToast();
+    fToast.init(context);
   }
 
   @override

@@ -58,6 +58,7 @@ class _HomeState extends State<Home> {
                                             groupName: snapshot.data!.docs[index].get('groupName'),
                                             cid: snapshot.data!.docs[index].get('cid'),
                                             channelName: snapshot.data!.docs[index].get('channelName'),
+                                            aid: snapshot.data!.docs[index].get('aid'),
                                             title: snapshot.data!.docs[index].get('title'),
                                             descriptions: snapshot.data!.docs[index].get('descriptions'),
                                             points: snapshot.data!.docs[index].get('points'),

@@ -5,6 +5,8 @@ import 'package:flutter_assignme/screens/components/submit_button.dart';
 import 'package:flutter_assignme/screens/components/icon_text_input.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import 'components/toast.dart';
+
 class CreateGroupScreen extends StatefulWidget {
   const CreateGroupScreen({Key? key}) : super(key: key);
 
@@ -14,15 +16,16 @@ class CreateGroupScreen extends StatefulWidget {
 
 class _CreateGroupScreenState extends State<CreateGroupScreen> {
   final TextEditingController groupNameController = TextEditingController();
+  late FToast fToast;
 
   Future createGroup() async {
     User? user = FirebaseAuth.instance.currentUser;
 
     if (groupNameController.text.isEmpty) {
-      Fluttertoast.showToast(
-        msg: "Group name is required.",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
+      fToast.showToast(
+        child: toast('Group name is required.'),
+        gravity: ToastGravity.BOTTOM,
+        toastDuration: Duration(seconds: 2),
       );
     } else {
       DocumentReference groupDoc = await FirebaseFirestore.instance.collection('groups').add({
@@ -40,8 +43,15 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       });
       FirebaseFirestore.instance.collection('channels').doc(channelDoc.id).update({
         'cid': channelDoc.id,
-      });
+      }).then((value) => Navigator.pop(context));
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fToast = FToast();
+    fToast.init(context);
   }
 
   @override
@@ -66,7 +76,6 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                       margin: EdgeInsets.only(top: 20, left: 20),
                       child: TextButton(
                         onPressed: () {
-                          Fluttertoast.cancel();
                           Navigator.pop(context);
                         },
                         style: ButtonStyle(
@@ -113,10 +122,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   SubmitButton(
                       title: 'Create Group',
                       onPressed: () async {
-                        createGroup().then((value) => {
-                              Fluttertoast.cancel(),
-                              Navigator.pop(context),
-                            });
+                        createGroup();
                       }),
                 ],
               ),

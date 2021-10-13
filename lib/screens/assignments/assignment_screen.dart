@@ -1,10 +1,13 @@
 import 'dart:io';
-import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/components/behavior.dart';
+import 'package:flutter_assignme/screens/components/toast.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:open_file/open_file.dart';
 
 class AssignmentScreen extends StatefulWidget {
@@ -14,6 +17,7 @@ class AssignmentScreen extends StatefulWidget {
     required this.groupName,
     required this.cid,
     required this.channelName,
+    required this.aid,
     required this.title,
     required this.descriptions,
     required this.points,
@@ -25,6 +29,7 @@ class AssignmentScreen extends StatefulWidget {
   final String groupName;
   final String cid;
   final String channelName;
+  final String aid;
   final String title;
   final String descriptions;
   final num points;
@@ -36,35 +41,71 @@ class AssignmentScreen extends StatefulWidget {
 }
 
 class _AssignmentScreenState extends State<AssignmentScreen> {
+  User? user = FirebaseAuth.instance.currentUser;
+
+  final List files = [];
+  final List url = [];
+  late Future<String> urlDownload;
+  late Size listviewSize;
+  late FToast fToast;
+
   String? filePath;
   String fileName = '';
   File? file;
-  late Future<String> urlDownload;
 
   Future getFileAndUpload() async {
     final result = await FilePicker.platform.pickFiles();
     if (result != null) {
-      // Uint8List? fileBytes = result.files.first.bytes;
       setState(() {
         filePath = result.files.first.path;
         file = File(filePath!);
-        fileName = result.files.first.name;
+        fileName = '${DateTime.now().millisecondsSinceEpoch}_${result.files.first.name}';
       });
-
       Reference ref = FirebaseStorage.instance.ref('uploads/$fileName');
-
       UploadTask uploadTask = ref.putFile(file!);
       final snapshot = await uploadTask.whenComplete(() => {});
       final urlDownload = await snapshot.ref.getDownloadURL();
-      print('Download-Link: $urlDownload');
+      setState(() {
+        files.add({'fileName': fileName, 'url': urlDownload});
+        url.add(urlDownload);
+        print(url);
+      });
     }
+  }
+
+  removeFile(String urlDownload) {
+    url.removeWhere((element) => element == urlDownload);
+    print(url);
   }
 
   Future openFile() async {
     if (filePath != null) {
-      print(filePath);
       await OpenFile.open(filePath);
     }
+  }
+
+  Future newResponse() async {
+    if (url.length == 0) {
+      fToast.showToast(
+        child: toast('Works are empty please attach file.'),
+        gravity: ToastGravity.BOTTOM,
+        toastDuration: Duration(seconds: 2),
+      );
+    } else {
+      DocumentReference responseDoc = await FirebaseFirestore.instance.collection('responses').add({
+        'aid': widget.aid,
+        'assignee': user!.uid,
+        'url': FieldValue.arrayUnion(url),
+      });
+      FirebaseFirestore.instance.collection('responses').doc(responseDoc.id).update({'rid': responseDoc.id}).then((value) => Navigator.pop(context));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fToast = FToast();
+    fToast.init(context);
   }
 
   @override
@@ -82,7 +123,9 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
         backgroundColor: Colors.grey[900],
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              newResponse();
+            },
             icon: Icon(
               Icons.send,
               color: Colors.white,
@@ -150,6 +193,50 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
                     style: TextStyle(color: Colors.grey[400]),
                   ),
                   SizedBox(height: 5),
+                  Container(
+                    height: 50.0 * files.length,
+                    child: ListView.builder(
+                        itemCount: files.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            height: 50,
+                            child: TextButton(
+                              onPressed: () {
+                                openFile();
+                              },
+                              style: ButtonStyle(splashFactory: NoSplash.splashFactory),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(Icons.insert_drive_file, color: Colors.white),
+                                      SizedBox(width: 10),
+                                      Text(
+                                        '${files[index]['fileName']}',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          removeFile(files[index]['url']);
+                                          files.removeAt(index);
+                                        });
+                                      },
+                                      icon: Icon(
+                                        Icons.delete,
+                                        color: Colors.red,
+                                      ))
+                                ],
+                              ),
+                            ),
+                          );
+                        }),
+                  ),
                   TextButton(
                     onPressed: () {
                       getFileAndUpload();
@@ -173,16 +260,6 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
                         ],
                       ),
                     ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextButton(
-                          onPressed: () {
-                            openFile();
-                          },
-                          child: Text('File Name: $fileName')),
-                    ],
                   ),
                 ],
               ),
