@@ -8,9 +8,6 @@ import 'package:flutter_assignme/screens/members/members_screen.dart';
 import 'package:flutter_assignme/screens/notifications/components/notifications_button.dart';
 import 'package:flutter_assignme/screens/home/components/group_button.dart';
 import 'package:flutter_assignme/screens/profile_screen.dart';
-import 'package:flutter_assignme/services/authentication_service.dart';
-import 'package:provider/provider.dart';
-
 import '../components/behavior.dart';
 import 'components/channel_option_button.dart';
 import '../notifications/notifications_screen.dart';
@@ -282,7 +279,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     child: Padding(
                       padding: EdgeInsets.only(left: 20, right: 5),
                       child: Row(
-                        mainAxisSize: MainAxisSize.max,
                         children: [
                           InkWell(
                             child: Icon(Icons.menu, color: Colors.white),

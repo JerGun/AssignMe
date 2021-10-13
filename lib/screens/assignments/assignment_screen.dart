@@ -5,8 +5,9 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/components/behavior.dart';
+import 'package:open_file/open_file.dart';
 
-class AssignmentScreen extends StatelessWidget {
+class AssignmentScreen extends StatefulWidget {
   const AssignmentScreen({
     Key? key,
     required this.gid,
@@ -30,16 +31,39 @@ class AssignmentScreen extends StatelessWidget {
   final String dateDue;
   final String timeDue;
 
-  Future getFileAndUpload() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
- 
-    );
-    if (result != null) {
-      Uint8List? fileBytes = result.files.first.bytes;
-      String fileName = result.files.first.name;
+  @override
+  _AssignmentScreenState createState() => _AssignmentScreenState();
+}
 
-      // Upload file
-      await FirebaseStorage.instance.ref('uploads/$fileName').putData(fileBytes!);
+class _AssignmentScreenState extends State<AssignmentScreen> {
+  String? filePath;
+  String fileName = '';
+  File? file;
+  late Future<String> urlDownload;
+
+  Future getFileAndUpload() async {
+    final result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      // Uint8List? fileBytes = result.files.first.bytes;
+      setState(() {
+        filePath = result.files.first.path;
+        file = File(filePath!);
+        fileName = result.files.first.name;
+      });
+
+      Reference ref = FirebaseStorage.instance.ref('uploads/$fileName');
+
+      UploadTask uploadTask = ref.putFile(file!);
+      final snapshot = await uploadTask.whenComplete(() => {});
+      final urlDownload = await snapshot.ref.getDownloadURL();
+      print('Download-Link: $urlDownload');
+    }
+  }
+
+  Future openFile() async {
+    if (filePath != null) {
+      print(filePath);
+      await OpenFile.open(filePath);
     }
   }
 
@@ -48,7 +72,7 @@ class AssignmentScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '$groupName | $channelName',
+          '${widget.groupName} | ${widget.channelName}',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
@@ -79,7 +103,7 @@ class AssignmentScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title,
+                    widget.title,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -88,7 +112,7 @@ class AssignmentScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'Due $dateDue $timeDue',
+                    'Due ${widget.dateDue} ${widget.timeDue}',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.white,
@@ -101,7 +125,7 @@ class AssignmentScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 5),
                   Text(
-                    '$descriptions',
+                    '${widget.descriptions}',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.white,
@@ -114,7 +138,7 @@ class AssignmentScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 5),
                   Text(
-                    '$points',
+                    '${widget.points}',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.white,
@@ -149,7 +173,17 @@ class AssignmentScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                  )
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextButton(
+                          onPressed: () {
+                            openFile();
+                          },
+                          child: Text('File Name: $fileName')),
+                    ],
+                  ),
                 ],
               ),
             ),
