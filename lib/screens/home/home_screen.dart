@@ -157,6 +157,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                   ],
                                                 )
                                               : GroupButton(
+                                                  groupName: snapshot.data!.docs[index - 1].get('groupName'),
                                                   groupSelectedIndex: groupSelectedIndex,
                                                   index: index,
                                                   onPressed: () {
