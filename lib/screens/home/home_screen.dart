@@ -121,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         return ListView.builder(
                                           itemCount: snapshot.data!.docs.length + 2,
                                           itemBuilder: (context, index) {
-                                            if (!snapshot.hasData) {
+                                            if (!userSnapshot.hasData) {
                                               return Center(
                                                 child: CircularProgressIndicator(),
                                               );
@@ -202,7 +202,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           ),
                         ),
                         groupName == 'Notifications'
-                            ? NotificationsScreen(uid: user!.uid)
+                            ? NotificationsScreen(
+                                uid: user!.uid,
+                                userRole: userRole,
+                              )
                             : Container(
                                 width: MediaQuery.of(context).size.width * 0.625,
                                 height: MediaQuery.of(context).size.height,
@@ -772,7 +775,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               ),
                             ),
                           ),
-                          if (groupName != 'Notifications' || userRole != 'teacher')
+                          if (groupName != 'Notifications' || channelName != 'Welcome to AssignMe')
                             IconButton(
                               onPressed: () {
                                 Navigator.push(
@@ -785,7 +788,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               },
                               icon: Icon(Icons.attach_file, color: Colors.white),
                             ),
-                          if (groupName != 'Notifications' || userRole != 'teacher')
+                          if (groupName != 'Notifications' && userRole == 'teacher')
                             IconButton(
                               onPressed: () {
                                 Navigator.push(
@@ -831,14 +834,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
-                  Home()
+                  Home(
+                    userRole: userRole,
+                  )
                 ],
               ),
             ),
           ),
         ],
       ),
-      Container(),
       ProfileScreen(),
     ];
 
@@ -848,36 +852,36 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         color: Colors.grey[900],
         child: SafeArea(child: _children[_selectedIndex]),
       ),
-      floatingActionButton: Theme(
-        data: ThemeData(
-          splashColor: Colors.transparent,
-        ),
-        child: AnimatedBuilder(
-          animation: _bottomNavController,
-          builder: (context, child) {
-            return AnimatedContainer(
-              duration: duration,
-              width: isLeftCollapsed && isRightCollapsed ? 60 : 0,
-              height: isLeftCollapsed && isRightCollapsed ? 60 : 0,
-              child: child,
-            );
-          },
-          child: Wrap(
-            children: [
-              FloatingActionButton(
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => AddAssignmentScreen(gid: gid, groupName: groupName, cid: cid, channelName: channelName)));
-                },
-                child: Icon(
-                  Icons.add,
-                  color: isLeftCollapsed && isRightCollapsed ? Colors.grey[850] : Colors.transparent,
-                ),
-                backgroundColor: Colors.yellow,
-              ),
-            ],
-          ),
-        ),
-      ),
+      // floatingActionButton: Theme(
+      //   data: ThemeData(
+      //     splashColor: Colors.transparent,
+      //   ),
+      //   child: AnimatedBuilder(
+      //     animation: _bottomNavController,
+      //     builder: (context, child) {
+      //       return AnimatedContainer(
+      //         duration: duration,
+      //         width: isLeftCollapsed && isRightCollapsed ? 60 : 0,
+      //         height: isLeftCollapsed && isRightCollapsed ? 60 : 0,
+      //         child: child,
+      //       );
+      //     },
+      //     child: Wrap(
+      //       children: [
+      //         FloatingActionButton(
+      //           onPressed: () {
+      //             Navigator.push(context, MaterialPageRoute(builder: (context) => AddAssignmentScreen(gid: gid, groupName: groupName, cid: cid, channelName: channelName)));
+      //           },
+      //           child: Icon(
+      //             Icons.add,
+      //             color: isLeftCollapsed && isRightCollapsed ? Colors.grey[850] : Colors.transparent,
+      //           ),
+      //           backgroundColor: Colors.yellow,
+      //         ),
+      //       ],
+      //     ),
+      //   ),
+      // ),
       bottomNavigationBar: Theme(
         data: ThemeData(
           splashColor: Colors.transparent,
@@ -906,10 +910,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       Icons.home,
                     ),
                     label: 'Home',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.people),
-                    label: 'People',
                   ),
                   BottomNavigationBarItem(
                     icon: Icon(Icons.person),

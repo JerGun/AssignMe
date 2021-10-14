@@ -153,7 +153,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                                 getFileAndUpload();
                               },
                               child: CircleAvatar(
-                                radius: 80,
+                                radius: 60,
                                 backgroundColor: Colors.grey,
                                 backgroundImage: NetworkImage(urlDownload),
                                 child: urlDownload != ''
@@ -166,8 +166,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                                                 : groupNameController.text.substring(0, 2).toUpperCase(),
                                         style: TextStyle(
                                           color: Colors.black,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
+                                          fontSize: 30,
                                         ),
                                       ),
                               ),

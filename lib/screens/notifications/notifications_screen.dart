@@ -3,9 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/components/behavior.dart';
 
 class NotificationsScreen extends StatefulWidget {
-  const NotificationsScreen({Key? key, required this.uid}) : super(key: key);
+  const NotificationsScreen({
+    Key? key,
+    required this.uid,
+    required this.userRole,
+  }) : super(key: key);
 
   final String uid;
+  final String userRole;
 
   @override
   _NotificationsScreenState createState() => _NotificationsScreenState();
@@ -13,7 +18,7 @@ class NotificationsScreen extends StatefulWidget {
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
   Future joinGroup(String docID, String groupID) async {
-    FirebaseFirestore.instance.collection('invites').doc(docID).update({'status': true});
+    FirebaseFirestore.instance.collection('invites').doc(docID).delete();
     FirebaseFirestore.instance.collection('groups').doc(groupID).update({
       'members': FieldValue.arrayUnion([widget.uid])
     });
@@ -73,6 +78,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       child: CircularProgressIndicator(),
                     );
                   } else {
+                    if (snapshot.data!.docs.length == 0)
+                      return Container(
+                        height: MediaQuery.of(context).size.height * 0.7,
+                        alignment: Alignment.center,
+                        child: Text(
+                          'No notifications yet.',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                      );
+
                     return ListView.builder(
                       itemCount: snapshot.data!.docs.length,
                       itemBuilder: (context, index) {
@@ -129,18 +147,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               ),
                             ],
                           );
-                        if (index == 0)
-                          return Container(
-                            height: MediaQuery.of(context).size.height * 0.7,
-                            alignment: Alignment.center,
-                            child: Text(
-                              'No notifications yet.',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                              ),
-                            ),
-                          );
+
                         return SizedBox();
                       },
                     );

@@ -1,7 +1,10 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/components/submit_button.dart';
 import 'package:flutter_assignme/screens/components/icon_text_input.dart';
@@ -22,13 +25,17 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
-
-  String role = 'teacher';
+  late String urlDownload = '';
   late FToast fToast;
 
-  Future signUp() async {
-    User? user = FirebaseAuth.instance.currentUser;
+  String role = 'teacher';
+  String? filePath;
+  String fileName = '';
+  File? file;
 
+  User? user = FirebaseAuth.instance.currentUser;
+
+  Future signUp() async {
     firstNameController.text.isEmpty
         ? fToast.showToast(
             child: toast('First name is required.'),
@@ -41,13 +48,31 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 gravity: ToastGravity.BOTTOM,
                 toastDuration: Duration(seconds: 2),
               )
-            : await FirebaseFirestore.instance
-                .collection('users')
-                .doc(user!.uid)
-                .update({'role': role, 'tag': Random().nextInt(9999), 'firstName': firstNameController.text, 'lastName': lastNameController.text}).then((value) => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()),
-                    ));
+            : await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({
+                'role': role,
+                'tag': Random().nextInt(9999),
+                'firstName': firstNameController.text,
+                'lastName': lastNameController.text,
+                'img': urlDownload,
+              }).then((value) => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                ));
+  }
+
+  Future getFileAndUpload() async {
+    final result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['jpg', 'jpeg', 'png']);
+    if (result != null) {
+      setState(() {
+        filePath = result.files.first.path;
+        file = File(filePath!);
+        fileName = '${DateTime.now().millisecondsSinceEpoch}_${result.files.first.name}';
+      });
+      Reference ref = FirebaseStorage.instance.ref('uploads/$fileName');
+      UploadTask uploadTask = ref.putFile(file!);
+      final snapshot = await uploadTask.whenComplete(() => {});
+      urlDownload = await snapshot.ref.getDownloadURL();
+    }
   }
 
   @override
@@ -107,6 +132,31 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               Text(
                                 'PLease fill the input blow here.',
                                 style: TextStyle(fontSize: 16, color: Colors.white),
+                              ),
+                              SizedBox(height: 30),
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.75,
+                                child: InkWell(
+                                  onTap: () {
+                                    getFileAndUpload();
+                                  },
+                                  child: CircleAvatar(
+                                    radius: 60,
+                                    backgroundColor: Colors.grey,
+                                    backgroundImage: NetworkImage(urlDownload),
+                                    child: urlDownload != ''
+                                        ? Container()
+                                        : Text(
+                                            firstNameController.text.isEmpty || lastNameController.text.isEmpty
+                                                ? ''
+                                                : '${firstNameController.text[0].toUpperCase()}${lastNameController.text[0].toUpperCase()}',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 30,
+                                            ),
+                                          ),
+                                  ),
+                                ),
                               ),
                               SizedBox(height: 30),
                               Row(

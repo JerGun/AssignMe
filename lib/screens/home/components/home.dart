@@ -5,7 +5,9 @@ import 'package:flutter_assignme/screens/assignments/assignment_screen.dart';
 import 'package:flutter_assignme/screens/components/behavior.dart';
 
 class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+  const Home({Key? key, required this.userRole}) : super(key: key);
+
+  final String userRole;
 
   @override
   _HomeState createState() => _HomeState();
@@ -27,6 +29,18 @@ class _HomeState extends State<Home> {
               child: CircularProgressIndicator(),
             );
           } else {
+            if (snapshot.data!.docs.isEmpty)
+              return Container(
+                height: MediaQuery.of(context).size.height * 0.5,
+                alignment: Alignment.center,
+                child: Text(
+                  'No assignments yet.',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
+                ),
+              );
             return ListView.builder(
                 itemCount: snapshot.data!.docs.length,
                 itemBuilder: (context, index) {
@@ -50,21 +64,23 @@ class _HomeState extends State<Home> {
                           ),
                           child: TextButton(
                             onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => AssignmentScreen(
-                                            gid: snapshot.data!.docs[index].get('gid'),
-                                            groupName: snapshot.data!.docs[index].get('groupName'),
-                                            cid: snapshot.data!.docs[index].get('cid'),
-                                            channelName: snapshot.data!.docs[index].get('channelName'),
-                                            aid: snapshot.data!.docs[index].get('aid'),
-                                            title: snapshot.data!.docs[index].get('title'),
-                                            descriptions: snapshot.data!.docs[index].get('descriptions'),
-                                            points: snapshot.data!.docs[index].get('points'),
-                                            dateDue: snapshot.data!.docs[index].get('dateDue'),
-                                            timeDue: snapshot.data!.docs[index].get('timeDue'),
-                                          )));
+                              widget.userRole == 'teacher'
+                                  ? print(widget.userRole)
+                                  : Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => AssignmentScreen(
+                                                gid: snapshot.data!.docs[index].get('gid'),
+                                                groupName: snapshot.data!.docs[index].get('groupName'),
+                                                cid: snapshot.data!.docs[index].get('cid'),
+                                                channelName: snapshot.data!.docs[index].get('channelName'),
+                                                aid: snapshot.data!.docs[index].get('aid'),
+                                                title: snapshot.data!.docs[index].get('title'),
+                                                descriptions: snapshot.data!.docs[index].get('descriptions'),
+                                                points: snapshot.data!.docs[index].get('points'),
+                                                dateDue: snapshot.data!.docs[index].get('dateDue'),
+                                                timeDue: snapshot.data!.docs[index].get('timeDue'),
+                                              )));
                             },
                             style: ButtonStyle(splashFactory: NoSplash.splashFactory),
                             child: Container(

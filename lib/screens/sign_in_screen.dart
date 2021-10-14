@@ -68,7 +68,7 @@ class SignInScreen extends StatelessWidget {
                       SubmitButton(
                         title: 'Sign in',
                         onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => CreateGroupScreen()));
+                          // Navigator.push(context, MaterialPageRoute(builder: (context) => CreateGroupScreen()));
                           // context.read<AuthenticationService>().signInWithEmail(
                           //     email: emailController.text.trim(),
                           //     password: passwordController.text.trim());

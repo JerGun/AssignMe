@@ -29,6 +29,8 @@ class _MembersScreenState extends State<MembersScreen> {
     }).then((value) => {Navigator.pop(context), Navigator.pop(context)});
   }
 
+  List members = [];
+
   @override
   Widget build(BuildContext context) {
     topPadding = MediaQuery.of(context).padding.top;
@@ -52,7 +54,7 @@ class _MembersScreenState extends State<MembersScreen> {
                     child: CircularProgressIndicator(),
                   );
                 } else {
-                  var members = snapshot.data!.docs[0].get('members');
+                  if (snapshot.data!.docs.length != 0) members = snapshot.data!.docs[0].get('members');
                   return Padding(
                     padding: EdgeInsets.all(20),
                     child: Column(
@@ -286,7 +288,7 @@ class _MembersScreenState extends State<MembersScreen> {
           ),
         ),
       );
-    else
-      return Container();
+
+    return Container();
   }
 }

@@ -70,29 +70,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Stack(
-                            children: [
-                              Container(
-                                width: 90,
-                                height: 90,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[700],
-                                  borderRadius: BorderRadius.circular(100),
-                                ),
-                              ),
-                              Positioned(
-                                top: 5,
-                                left: 5,
-                                child: Container(
-                                  width: 80,
-                                  height: 80,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(100),
+                          CircleAvatar(
+                            radius: 60,
+                            backgroundColor: Colors.grey,
+                            backgroundImage: NetworkImage(data['img']),
+                            child: data['img'] != ''
+                                ? Container()
+                                : Text(
+                                    '${data['firstName'][0].toUpperCase()}${data['firstName'][0].toUpperCase()}',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ],
                           ),
                           SizedBox(height: 20),
                           Row(
@@ -131,7 +122,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     SizedBox(height: 10),
                     TextButton(
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfileScreen()));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => EditProfileScreen(
+                                      img: data['img'],
+                                    )));
                       },
                       child: Padding(
                         padding: EdgeInsets.only(left: 20),
