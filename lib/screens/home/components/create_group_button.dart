@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../create_group_screen.dart';
+import '../../groups/create_group_screen.dart';
 
 class CreateGroupButton extends StatelessWidget {
   const CreateGroupButton({
@@ -16,7 +16,7 @@ class CreateGroupButton extends StatelessWidget {
           height: 55,
           child: ElevatedButton(
             onPressed: () async{
-              final result = await Navigator.push(
+              Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => CreateGroupScreen()),
               );

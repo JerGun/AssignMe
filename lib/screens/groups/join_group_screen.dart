@@ -1,54 +1,57 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_assignme/screens/components/behavior.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
-import 'components/behavior.dart';
-
-class InviteMemberScreen extends StatefulWidget {
-  const InviteMemberScreen({
-    Key? key,
-    required this.gid,
-    required this.groupName,
-  }) : super(key: key);
-
-  final String gid;
-  final String groupName;
+class JoinGroupScreen extends StatefulWidget {
+  const JoinGroupScreen({Key? key}) : super(key: key);
 
   @override
-  _InviteMemberScreenState createState() => _InviteMemberScreenState();
+  _JoinGroupScreenState createState() => _JoinGroupScreenState();
 }
 
-class _InviteMemberScreenState extends State<InviteMemberScreen> {
+class _JoinGroupScreenState extends State<JoinGroupScreen> {
   final TextEditingController searchController = TextEditingController();
+
+  final TextEditingController groupNameController = TextEditingController();
+  late FToast fToast;
 
   User? user = FirebaseAuth.instance.currentUser;
 
-  Future inviteMember(String inviteeID) async {
-    if (inviteeID != user!.uid) {
-      FirebaseFirestore.instance.collection('invites').add({
-        'gid': widget.gid,
-        'groupName': widget.groupName,
-        'invitee': inviteeID,
-        'inviter': user!.uid,
-        'timestamp': DateTime.now().millisecondsSinceEpoch,
-        'status': false,
-      });
-    }
+  Future requestJoin(String requesteeID) async {
+    // if (inviteeID != user!.uid) {
+    //   FirebaseFirestore.instance.collection('invites').add({
+    //     'gid': widget.gid,
+    //     'groupName': widget.groupName,
+    //     'invitee': inviteeID,
+    //     'inviter': user!.uid,
+    //     'timestamp': DateTime.now().millisecondsSinceEpoch,
+    //     'status': false,
+    //   });
+    // }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fToast = FToast();
+    fToast.init(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    Stream<QuerySnapshot> streamAll = FirebaseFirestore.instance.collection('users').snapshots();
+    Stream<QuerySnapshot> streamAll = FirebaseFirestore.instance.collection('groups').snapshots();
 
     Stream<QuerySnapshot> streamTag =
-        FirebaseFirestore.instance.collection('users').where('tag', isEqualTo: searchController.text.length > 1 ? searchController.text.substring(1) : searchController.text).snapshots();
+        FirebaseFirestore.instance.collection('groups').where('tag', isEqualTo: searchController.text.length > 1 ? searchController.text.substring(1) : searchController.text).snapshots();
 
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            'Invite Members',
+            'Join Group',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
@@ -125,7 +128,7 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
                         return ListView.builder(
                           itemCount: snapshot.data!.docs.length,
                           itemBuilder: (context, index) {
-                            if (snapshot.data!.docs[index].get('uid') != user!.uid)
+                            if (!snapshot.data!.docs[index].get('members').contains(user!.uid))
                               return Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                                 child: Row(
@@ -140,7 +143,7 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
                                           child: snapshot.data!.docs[index].get('img') != ''
                                               ? Container()
                                               : Text(
-                                                  '${snapshot.data!.docs[index].get('firstName')[0].toUpperCase()}${snapshot.data!.docs[index].get('lastName')[0].toUpperCase()}',
+                                                  snapshot.data!.docs[index].get('groupName').substring(0, 2).toUpperCase(),
                                                   style: TextStyle(
                                                     color: Colors.black,
                                                   ),
@@ -148,24 +151,24 @@ class _InviteMemberScreenState extends State<InviteMemberScreen> {
                                         ),
                                         SizedBox(width: 20),
                                         Text(
-                                          '${snapshot.data!.docs[index].get('firstName')} ${snapshot.data!.docs[index].get('lastName')}',
+                                          snapshot.data!.docs[index].get('groupName'),
                                           style: TextStyle(color: Colors.white),
                                         ),
                                       ],
                                     ),
                                     ElevatedButton(
                                       onPressed: () {
-                                        if (user!.uid != snapshot.data!.docs[index].get('uid')) inviteMember(snapshot.data!.docs[index].get('uid'));
+                                        // if (user!.uid != snapshot.data!.docs[index].get('uid')) inviteMember(snapshot.data!.docs[index].get('uid'));
                                       },
                                       style: ElevatedButton.styleFrom(
                                           shape: new RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(5),
                                           ),
-                                          fixedSize: Size(MediaQuery.of(context).size.width * 0.2, 30),
-                                          primary: user!.uid != snapshot.data!.docs[index].get('uid') ? Colors.yellow : Colors.red),
+                                          fixedSize: Size(MediaQuery.of(context).size.width * 0.25, 30),
+                                          primary: Colors.green),
                                       child: Text(
-                                        'Invite',
-                                        style: TextStyle(color: user!.uid != snapshot.data!.docs[index].get('uid') ? Colors.grey[850] : Colors.white),
+                                        'Request',
+                                        style: TextStyle(color: Colors.white),
                                       ),
                                     )
                                   ],

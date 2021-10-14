@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/assignments/add_assignment_screen.dart';
+import 'package:flutter_assignme/screens/groups/join_group_screen.dart';
 import 'package:flutter_assignme/screens/home/components/home.dart';
 import 'package:flutter_assignme/screens/components/settings_option.dart';
 import 'package:flutter_assignme/screens/members/members_screen.dart';
@@ -9,7 +10,7 @@ import 'package:flutter_assignme/screens/notifications/components/notifications_
 import 'package:flutter_assignme/screens/home/components/group_button.dart';
 import 'package:flutter_assignme/screens/profile_screen.dart';
 import '../components/behavior.dart';
-import '../create_group_screen.dart';
+import '../groups/create_group_screen.dart';
 import 'components/channel_option_button.dart';
 import '../notifications/notifications_screen.dart';
 
@@ -39,6 +40,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool isRightCollapsed = true;
   String previousWidget = 'mid';
   int numberMembers = 0;
+  String img = '';
+  String owner = '';
 
   late List<Widget> _children;
 
@@ -57,7 +60,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         .where('gid', isEqualTo: gid)
         .get()
         .then((value) => {
-              print(value.docs),
               for (QueryDocumentSnapshot snapshot in value.docs) {FirebaseFirestore.instance.collection('channels').doc(snapshot.id).delete()}
             })
         .then((value) => {Navigator.pop(context), Navigator.pop(context)});
@@ -123,41 +125,56 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                 });
                                               })
                                           : index == snapshot.data!.docs.length + 1
-                                              ? Column(
-                                                  children: [
-                                                    Container(
-                                                      width: 55,
-                                                      height: 55,
-                                                      child: ElevatedButton(
-                                                        onPressed: () async {
-                                                          final result = await Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(builder: (context) => CreateGroupScreen()),
-                                                          );
-                                                          setState(() {
-                                                            if (result != null) {
-                                                              gid = result[0];
-                                                              groupName = result[1];
-                                                              groupSelectedIndex = 1;
-                                                            }
-                                                          });
-                                                        },
-                                                        style: ElevatedButton.styleFrom(
-                                                            shape: new RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius.circular(40),
+                                              ? FutureBuilder<DocumentSnapshot>(
+                                                  future: FirebaseFirestore.instance.collection('users').doc(user!.uid).get(),
+                                                  builder: (context, snapshot) {
+                                                    if (!snapshot.hasData) {
+                                                      return Center(
+                                                        child: CircularProgressIndicator(),
+                                                      );
+                                                    }
+                                                    Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                                                    return Column(
+                                                      children: [
+                                                        Container(
+                                                          width: 55,
+                                                          height: 55,
+                                                          child: ElevatedButton(
+                                                            onPressed: () async {
+                                                              if (data['role'] == 'teacher') {
+                                                                Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(builder: (context) => CreateGroupScreen()),
+                                                                ).then((value) => setState(() {
+                                                                      groupName = 'Notifications';
+                                                                      groupSelectedIndex = 0;
+                                                                    }));
+                                                              } else {
+                                                                Navigator.push(context, MaterialPageRoute(builder: (context) => JoinGroupScreen())).then((value) => setState(() {
+                                                                      groupName = 'Notifications';
+                                                                      groupSelectedIndex = 0;
+                                                                    }));
+                                                              }
+                                                            },
+                                                            style: ElevatedButton.styleFrom(
+                                                                shape: new RoundedRectangleBorder(
+                                                                  borderRadius: BorderRadius.circular(40),
+                                                                ),
+                                                                primary: Colors.grey[800]),
+                                                            child: Icon(
+                                                              Icons.add,
+                                                              color: Colors.yellow,
                                                             ),
-                                                            primary: Colors.grey[800]),
-                                                        child: Icon(
-                                                          Icons.add,
-                                                          color: Colors.yellow,
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ),
-                                                    SizedBox(height: 10),
-                                                  ],
+                                                        SizedBox(height: 10),
+                                                      ],
+                                                    );
+                                                  },
                                                 )
                                               : GroupButton(
                                                   groupName: snapshot.data!.docs[index - 1].get('groupName'),
+                                                  img: snapshot.data!.docs[index - 1].get('img'),
                                                   groupSelectedIndex: groupSelectedIndex,
                                                   index: index,
                                                   onPressed: () {
@@ -166,6 +183,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                       groupName = snapshot.data!.docs[index - 1].get('groupName');
                                                       gid = snapshot.data!.docs[index - 1].get('gid');
                                                       numberMembers = snapshot.data!.docs[index - 1].get('members').length;
+                                                      img = snapshot.data!.docs[index - 1].get('img');
+                                                      owner = snapshot.data!.docs[index - 1].get('owner');
                                                     });
                                                   },
                                                 );
@@ -220,13 +239,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                             child: Column(
                                                               crossAxisAlignment: CrossAxisAlignment.start,
                                                               children: [
-                                                                Container(
-                                                                  width: 80,
-                                                                  height: 80,
-                                                                  decoration: BoxDecoration(
-                                                                    color: Colors.white,
-                                                                    borderRadius: BorderRadius.circular(100),
-                                                                  ),
+                                                                CircleAvatar(
+                                                                  radius: 40,
+                                                                  backgroundColor: img != '' ? Colors.transparent : Colors.yellow,
+                                                                  backgroundImage: NetworkImage(img),
+                                                                  child: img != ''
+                                                                      ? Container()
+                                                                      : Text(
+                                                                          groupName.substring(0, 2).toUpperCase(),
+                                                                          style: TextStyle(
+                                                                            color: Colors.black,
+                                                                            fontSize: 18,
+                                                                            fontWeight: FontWeight.bold,
+                                                                          ),
+                                                                        ),
                                                                 ),
                                                                 SizedBox(height: 20),
                                                                 Text(
@@ -253,81 +279,145 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                               crossAxisAlignment: CrossAxisAlignment.start,
                                                               children: [
                                                                 Container(
-                                                                  width: MediaQuery.of(context).size.width,
-                                                                  decoration: BoxDecoration(
-                                                                    color: Colors.grey[800],
-                                                                    borderRadius: BorderRadius.circular(10),
-                                                                  ),
-                                                                  child: Column(
-                                                                    children: [
-                                                                      SettingsOption(
-                                                                        title: 'Group Settings',
-                                                                        icon: Icons.settings,
-                                                                        onPressed: () {},
-                                                                      ),
-                                                                      SettingsOption(
-                                                                        title: 'Delete Group',
-                                                                        icon: Icons.close,
-                                                                        color: Colors.red,
-                                                                        onPressed: () {
-                                                                          showDialog(
-                                                                            context: context,
-                                                                            builder: (context) {
-                                                                              return AlertDialog(
-                                                                                title: Text(
-                                                                                  "Delete '$groupName'",
-                                                                                  style: TextStyle(
-                                                                                    color: Colors.white,
-                                                                                  ),
-                                                                                ),
-                                                                                content: Text(
-                                                                                  'Are you sure you want to delete $groupName? \nThis action cannot be undone.',
-                                                                                  style: TextStyle(
-                                                                                    color: Colors.white,
-                                                                                    fontSize: 14,
-                                                                                  ),
-                                                                                ),
-                                                                                backgroundColor: Colors.grey[800],
-                                                                                actions: [
-                                                                                  TextButton(
-                                                                                    onPressed: () {
-                                                                                      Navigator.pop(context);
-                                                                                    },
-                                                                                    child: Text(
-                                                                                      'Cancle',
-                                                                                      style: TextStyle(
-                                                                                        color: Colors.white,
-                                                                                      ),
-                                                                                    ),
-                                                                                  ),
-                                                                                  Container(
-                                                                                    width: 100,
-                                                                                    height: 40,
-                                                                                    decoration: BoxDecoration(
-                                                                                      color: Colors.red,
-                                                                                      borderRadius: BorderRadius.circular(10),
-                                                                                    ),
-                                                                                    child: TextButton(
-                                                                                      onPressed: () async {
-                                                                                        deleteGroup();
-                                                                                      },
-                                                                                      child: Text(
-                                                                                        'Confirm',
-                                                                                        style: TextStyle(
-                                                                                          color: Colors.white,
+                                                                    width: MediaQuery.of(context).size.width,
+                                                                    decoration: BoxDecoration(
+                                                                      color: Colors.grey[800],
+                                                                      borderRadius: BorderRadius.circular(10),
+                                                                    ),
+                                                                    child: owner == user!.uid
+                                                                        ? Column(
+                                                                            children: [
+                                                                              SettingsOption(
+                                                                                title: 'Group Settings',
+                                                                                icon: Icons.settings,
+                                                                                onPressed: () {},
+                                                                              ),
+                                                                              SettingsOption(
+                                                                                title: 'Delete Group',
+                                                                                icon: Icons.close,
+                                                                                color: Colors.red,
+                                                                                onPressed: () {
+                                                                                  showDialog(
+                                                                                    context: context,
+                                                                                    builder: (context) {
+                                                                                      return AlertDialog(
+                                                                                        title: Text(
+                                                                                          "Delete '$groupName'",
+                                                                                          style: TextStyle(
+                                                                                            color: Colors.white,
+                                                                                          ),
                                                                                         ),
-                                                                                      ),
-                                                                                    ),
-                                                                                  )
-                                                                                ],
-                                                                              );
-                                                                            },
-                                                                          );
-                                                                        },
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                )
+                                                                                        content: Text(
+                                                                                          'Are you sure you want to delete $groupName? \nThis action cannot be undone.',
+                                                                                          style: TextStyle(
+                                                                                            color: Colors.white,
+                                                                                            fontSize: 14,
+                                                                                          ),
+                                                                                        ),
+                                                                                        backgroundColor: Colors.grey[800],
+                                                                                        actions: [
+                                                                                          TextButton(
+                                                                                            onPressed: () {
+                                                                                              Navigator.pop(context);
+                                                                                            },
+                                                                                            child: Text(
+                                                                                              'Cancle',
+                                                                                              style: TextStyle(
+                                                                                                color: Colors.white,
+                                                                                              ),
+                                                                                            ),
+                                                                                          ),
+                                                                                          Container(
+                                                                                            width: 100,
+                                                                                            height: 40,
+                                                                                            decoration: BoxDecoration(
+                                                                                              color: Colors.red,
+                                                                                              borderRadius: BorderRadius.circular(10),
+                                                                                            ),
+                                                                                            child: TextButton(
+                                                                                              onPressed: () async {
+                                                                                                deleteGroup();
+                                                                                              },
+                                                                                              child: Text(
+                                                                                                'Confirm',
+                                                                                                style: TextStyle(
+                                                                                                  color: Colors.white,
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                          )
+                                                                                        ],
+                                                                                      );
+                                                                                    },
+                                                                                  );
+                                                                                },
+                                                                              ),
+                                                                            ],
+                                                                          )
+                                                                        : Column(
+                                                                            children: [
+                                                                              SettingsOption(
+                                                                                title: 'Leave Group',
+                                                                                icon: Icons.exit_to_app,
+                                                                                color: Colors.red,
+                                                                                onPressed: () {
+                                                                                  showDialog(
+                                                                                    context: context,
+                                                                                    builder: (context) {
+                                                                                      return AlertDialog(
+                                                                                        title: Text(
+                                                                                          "Leave '$groupName'",
+                                                                                          style: TextStyle(
+                                                                                            color: Colors.white,
+                                                                                          ),
+                                                                                        ),
+                                                                                        content: Text(
+                                                                                          'Are you sure you want to leave $groupName?.',
+                                                                                          style: TextStyle(
+                                                                                            color: Colors.white,
+                                                                                            fontSize: 14,
+                                                                                          ),
+                                                                                        ),
+                                                                                        backgroundColor: Colors.grey[800],
+                                                                                        actions: [
+                                                                                          TextButton(
+                                                                                            onPressed: () {
+                                                                                              Navigator.pop(context);
+                                                                                            },
+                                                                                            child: Text(
+                                                                                              'Cancle',
+                                                                                              style: TextStyle(
+                                                                                                color: Colors.white,
+                                                                                              ),
+                                                                                            ),
+                                                                                          ),
+                                                                                          Container(
+                                                                                            width: 100,
+                                                                                            height: 40,
+                                                                                            decoration: BoxDecoration(
+                                                                                              color: Colors.red,
+                                                                                              borderRadius: BorderRadius.circular(10),
+                                                                                            ),
+                                                                                            child: TextButton(
+                                                                                              onPressed: () async {
+                                                                                                deleteGroup();
+                                                                                              },
+                                                                                              child: Text(
+                                                                                                'Confirm',
+                                                                                                style: TextStyle(
+                                                                                                  color: Colors.white,
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                          )
+                                                                                        ],
+                                                                                      );
+                                                                                    },
+                                                                                  );
+                                                                                },
+                                                                              ),
+                                                                            ],
+                                                                          ))
                                                               ],
                                                             ),
                                                           ),
@@ -413,7 +503,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ],
                     ),
                   )
-                : MembersScreen(gid: gid, groupName: groupName),
+                : groupName == 'Notification'
+                    ? Container()
+                    : MembersScreen(gid: gid, groupName: groupName),
           ),
           AnimatedPositioned(
             duration: duration,
