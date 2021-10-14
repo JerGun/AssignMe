@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class NotificationButton extends StatelessWidget {
   const NotificationButton({
     Key? key,
+    required this.groupName,
     required this.groupSelectedIndex,
     required this.index,
     required this.onPressed,
   }) : super(key: key);
 
+  final String groupName;
   final int groupSelectedIndex;
   final int index;
   final onPressed;
@@ -24,12 +26,12 @@ class NotificationButton extends StatelessWidget {
             onPressed: onPressed,
             style: ElevatedButton.styleFrom(
                 shape: new RoundedRectangleBorder(
-                  borderRadius: groupSelectedIndex == index ? BorderRadius.circular(20) : BorderRadius.circular(40),
+                  borderRadius: groupSelectedIndex == index || groupName == 'Notifications' ? BorderRadius.circular(20) : BorderRadius.circular(40),
                 ),
-                primary: groupSelectedIndex == index ? Colors.yellow : Colors.grey[800]),
+                primary: groupSelectedIndex == index || groupName == 'Notifications' ? Colors.yellow : Colors.grey[800]),
             child: Icon(
               Icons.notifications,
-              color: groupSelectedIndex == index ? Colors.grey[900] : Colors.grey,
+              color: groupSelectedIndex == index || groupName == 'Notifications' ? Colors.grey[900] : Colors.grey,
             ),
           ),
         ),

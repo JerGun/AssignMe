@@ -6,11 +6,13 @@ import '../../create_channel_screen.dart';
 class ChannelOptionButton extends StatelessWidget {
   const ChannelOptionButton({
     Key? key,
-    required this.groupID,
+    required this.userRole,
+    required this.gid,
     required this.groupName,
   }) : super(key: key);
 
-  final String groupID;
+  final String userRole;
+  final String gid;
   final String groupName;
 
   @override
@@ -18,37 +20,45 @@ class ChannelOptionButton extends StatelessWidget {
     return Column(
       children: [
         SizedBox(height: 20),
-        Container(
-          width: MediaQuery.of(context).size.width * 0.5,
-          height: 30,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                spreadRadius: 2,
-                blurRadius: 0,
-                offset: Offset(0, 5),
+        if (userRole == 'teacher')
+          Container(
+            width: MediaQuery.of(context).size.width * 0.5,
+            height: 30,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  spreadRadius: 2,
+                  blurRadius: 0,
+                  offset: Offset(0, 5),
+                ),
+              ],
+              color: Colors.grey[700],
+            ),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => InviteMemberScreen(
+                            gid: gid,
+                            groupName: groupName,
+                          )),
+                );
+              },
+              child: Center(
+                child: Text(
+                  'Invite Members',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
-            ],
-            color: Colors.grey[700],
-          ),
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => InviteMemberScreen(groupID: groupID, groupName: groupName,)),
-              );
-            },
-            child: Center(
-              child: Text(
-                'Invite Members',
-                style: TextStyle(color: Colors.white),
+              style: ElevatedButton.styleFrom(
+                splashFactory: NoSplash.splashFactory,
+                primary: Colors.grey[700],
               ),
             ),
-            style: ElevatedButton.styleFrom(splashFactory: NoSplash.splashFactory, primary: Colors.grey[700]),
           ),
-        ),
         SizedBox(height: 10),
         Padding(
           padding: EdgeInsets.only(
@@ -67,7 +77,11 @@ class ChannelOptionButton extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => CreateChannelScreen(groupID: groupID)),
+                    MaterialPageRoute(
+                        builder: (context) => CreateChannelScreen(
+                              gid: gid,
+                              groupName: groupName,
+                            )),
                   );
                 },
                 icon: Icon(

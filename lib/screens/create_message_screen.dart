@@ -11,7 +11,7 @@ class CreateMessageScreen extends StatelessWidget {
           'Create new message',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: 16,
           ),
         ),
         backgroundColor: Colors.grey[900],
