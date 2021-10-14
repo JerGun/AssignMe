@@ -43,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int numberMembers = 0;
   String img = '';
   String owner = '';
+  String userRole = '';
 
   late List<Widget> _children;
 
@@ -114,87 +115,87 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     child: CircularProgressIndicator(),
                                   );
                                 } else {
-                                  return ListView.builder(
-                                    itemCount: snapshot.data!.docs.length + 2,
-                                    itemBuilder: (context, index) {
-                                      return index == 0
-                                          ? NotificationButton(
-                                              groupName: groupName,
-                                              groupSelectedIndex: groupSelectedIndex,
-                                              index: index,
-                                              onPressed: () {
-                                                setState(() {
-                                                  groupSelectedIndex = index;
-                                                  groupName = 'Notifications';
-                                                  channelName = 'Welcome to AssignMe';
-                                                });
-                                              })
-                                          : index == snapshot.data!.docs.length + 1
-                                              ? FutureBuilder<DocumentSnapshot>(
-                                                  future: FirebaseFirestore.instance.collection('users').doc(user!.uid).get(),
-                                                  builder: (context, snapshot) {
-                                                    if (!snapshot.hasData) {
-                                                      return Center(
-                                                        child: CircularProgressIndicator(),
-                                                      );
-                                                    }
-                                                    Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-                                                    return Column(
-                                                      children: [
-                                                        Container(
-                                                          width: 55,
-                                                          height: 55,
-                                                          child: ElevatedButton(
-                                                            onPressed: () async {
-                                                              if (data['role'] == 'teacher') {
-                                                                Navigator.push(
-                                                                  context,
-                                                                  MaterialPageRoute(builder: (context) => CreateGroupScreen()),
-                                                                ).then((value) => setState(() {
-                                                                      groupName = 'Notifications';
-                                                                      groupSelectedIndex = 0;
-                                                                    }));
-                                                              } else {
-                                                                Navigator.push(context, MaterialPageRoute(builder: (context) => JoinGroupScreen())).then((value) => setState(() {
-                                                                      groupName = 'Notifications';
-                                                                      groupSelectedIndex = 0;
-                                                                    }));
-                                                              }
-                                                            },
-                                                            style: ElevatedButton.styleFrom(
-                                                                shape: new RoundedRectangleBorder(
-                                                                  borderRadius: BorderRadius.circular(40),
-                                                                ),
-                                                                primary: Colors.grey[800]),
-                                                            child: Icon(
-                                                              Icons.add,
-                                                              color: Colors.yellow,
+                                  return FutureBuilder<DocumentSnapshot>(
+                                      future: FirebaseFirestore.instance.collection('users').doc(user!.uid).get(),
+                                      builder: (context, userSnapshot) {
+                                        return ListView.builder(
+                                          itemCount: snapshot.data!.docs.length + 2,
+                                          itemBuilder: (context, index) {
+                                            if (!snapshot.hasData) {
+                                              return Center(
+                                                child: CircularProgressIndicator(),
+                                              );
+                                            }
+                                            Map<String, dynamic> user = userSnapshot.data!.data() as Map<String, dynamic>;
+                                            return index == 0
+                                                ? NotificationButton(
+                                                    groupName: groupName,
+                                                    groupSelectedIndex: groupSelectedIndex,
+                                                    index: index,
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        groupSelectedIndex = index;
+                                                        groupName = 'Notifications';
+                                                        channelName = 'Welcome to AssignMe';
+                                                      });
+                                                    })
+                                                : index == snapshot.data!.docs.length + 1
+                                                    ? Column(
+                                                        children: [
+                                                          Container(
+                                                            width: 55,
+                                                            height: 55,
+                                                            child: ElevatedButton(
+                                                              onPressed: () async {
+                                                                if (user['role'] == 'teacher') {
+                                                                  Navigator.push(
+                                                                    context,
+                                                                    MaterialPageRoute(builder: (context) => CreateGroupScreen()),
+                                                                  ).then((value) => setState(() {
+                                                                        groupName = 'Notifications';
+                                                                        groupSelectedIndex = 0;
+                                                                      }));
+                                                                } else {
+                                                                  Navigator.push(context, MaterialPageRoute(builder: (context) => JoinGroupScreen())).then((value) => setState(() {
+                                                                        groupName = 'Notifications';
+                                                                        groupSelectedIndex = 0;
+                                                                      }));
+                                                                }
+                                                              },
+                                                              style: ElevatedButton.styleFrom(
+                                                                  shape: new RoundedRectangleBorder(
+                                                                    borderRadius: BorderRadius.circular(40),
+                                                                  ),
+                                                                  primary: Colors.grey[800]),
+                                                              child: Icon(
+                                                                Icons.add,
+                                                                color: Colors.yellow,
+                                                              ),
                                                             ),
                                                           ),
-                                                        ),
-                                                        SizedBox(height: 10),
-                                                      ],
-                                                    );
-                                                  },
-                                                )
-                                              : GroupButton(
-                                                  groupName: snapshot.data!.docs[index - 1].get('groupName'),
-                                                  img: snapshot.data!.docs[index - 1].get('img'),
-                                                  groupSelectedIndex: groupSelectedIndex,
-                                                  index: index,
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      groupSelectedIndex = index;
-                                                      groupName = snapshot.data!.docs[index - 1].get('groupName');
-                                                      gid = snapshot.data!.docs[index - 1].get('gid');
-                                                      numberMembers = snapshot.data!.docs[index - 1].get('members').length;
-                                                      img = snapshot.data!.docs[index - 1].get('img');
-                                                      owner = snapshot.data!.docs[index - 1].get('owner');
-                                                    });
-                                                  },
-                                                );
-                                    },
-                                  );
+                                                          SizedBox(height: 10),
+                                                        ],
+                                                      )
+                                                    : GroupButton(
+                                                        groupName: snapshot.data!.docs[index - 1].get('groupName'),
+                                                        img: snapshot.data!.docs[index - 1].get('img'),
+                                                        groupSelectedIndex: groupSelectedIndex,
+                                                        index: index,
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            userRole = user['role'];
+                                                            groupSelectedIndex = index;
+                                                            groupName = snapshot.data!.docs[index - 1].get('groupName');
+                                                            gid = snapshot.data!.docs[index - 1].get('gid');
+                                                            numberMembers = snapshot.data!.docs[index - 1].get('members').length;
+                                                            img = snapshot.data!.docs[index - 1].get('img');
+                                                            owner = snapshot.data!.docs[index - 1].get('owner');
+                                                          });
+                                                        },
+                                                      );
+                                          },
+                                        );
+                                      });
                                 }
                               },
                             ),
@@ -771,14 +772,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               ),
                             ),
                           ),
-                          if (groupName != 'Notifications')
+                          if (groupName != 'Notifications' || userRole != 'teacher')
                             IconButton(
                               onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => AttachFileScreen()));
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => AttachFileScreen(
+                                              gid: gid,
+                                              userRole: userRole,
+                                            )));
                               },
                               icon: Icon(Icons.attach_file, color: Colors.white),
                             ),
-                          if (groupName != 'Notifications')
+                          if (groupName != 'Notifications' || userRole != 'teacher')
                             IconButton(
                               onPressed: () {
                                 Navigator.push(

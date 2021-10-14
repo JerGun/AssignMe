@@ -25,7 +25,6 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   late String urlDownload = '';
 
   late FToast fToast;
-  late Size listviewSize;
 
   String? filePath;
   String fileName = '';

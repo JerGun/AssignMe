@@ -46,7 +46,6 @@ class _AssignmentScreenState extends State<AssignmentScreen> {
   final List files = [];
   final List url = [];
   late Future<String> urlDownload;
-  late Size listviewSize;
   late FToast fToast;
 
   String? filePath;
