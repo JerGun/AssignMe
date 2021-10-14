@@ -14,9 +14,13 @@ class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({
     Key? key,
     required this.img,
+    required this.firstName,
+    required this.lastName,
   }) : super(key: key);
 
   final String img;
+  final String firstName;
+  final String lastName;
 
   @override
   _EditProfileScreenState createState() => _EditProfileScreenState();
@@ -76,6 +80,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     fToast = FToast();
     fToast.init(context);
     urlDownload = widget.img;
+    firstNameController.text = widget.firstName;
+    lastNameController.text = widget.lastName;
   }
 
   @override
@@ -97,7 +103,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 onPressed: () {
                   editProfile();
                 },
-                icon: Icon(Icons.check)),
+                icon: Icon(
+                  Icons.check,
+                  color: Colors.green,
+                )),
           ],
         ),
         body: Container(

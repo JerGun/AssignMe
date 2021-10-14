@@ -50,7 +50,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               )
             : await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({
                 'role': role,
-                'tag': Random().nextInt(9999),
+                'tag': Random().nextInt(9999).toString(),
                 'firstName': firstNameController.text,
                 'lastName': lastNameController.text,
                 'img': urlDownload,

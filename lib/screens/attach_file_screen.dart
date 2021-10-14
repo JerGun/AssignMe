@@ -5,7 +5,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:open_file/open_file.dart';
 
 class AttachFileScreen extends StatefulWidget {
   const AttachFileScreen({
@@ -62,12 +61,6 @@ class _AttachFileScreenState extends State<AttachFileScreen> {
     FirebaseFirestore.instance.collection('files').doc(fid).delete().then((value) => Navigator.pop(context));
   }
 
-  Future openFile() async {
-    if (filePath != null) {
-      await OpenFile.open(filePath);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -103,121 +96,134 @@ class _AttachFileScreenState extends State<AttachFileScreen> {
               builder: (context, snapshot) {
                 if (!snapshot.hasData)
                   return Center(
-                    child: CircularProgressIndicator(),
+                    child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.yellow)),
                   );
-                else
-                  return ListView.builder(
-                    itemCount: snapshot.data!.docs.length,
-                    itemBuilder: (context, index) {
-                      return Column(
-                        children: [
-                          SizedBox(height: 20),
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.9,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              color: Colors.grey[700],
-                            ),
-                            child: TextButton(
-                              onPressed: () {
-                                openFile();
-                              },
-                              style: ButtonStyle(splashFactory: NoSplash.splashFactory),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(Icons.insert_drive_file, color: Colors.white),
-                                      SizedBox(width: 10),
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
+                else if (snapshot.data!.docs.isEmpty)
+                  return Container(
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    alignment: Alignment.center,
+                    child: Text(
+                      'There is no file in this group.',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+                  );
+                return ListView.builder(
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (context, index) {
+                    return Column(
+                      children: [
+                        SizedBox(height: 20),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.9,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            color: Colors.grey[700],
+                          ),
+                          child: TextButton(
+                            onPressed: () {},
+                            style: ButtonStyle(splashFactory: NoSplash.splashFactory),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.insert_drive_file, color: Colors.white),
+                                    SizedBox(width: 10),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          width: MediaQuery.of(context).size.width * 0.65,
+                                          child: Text(
                                             '${snapshot.data!.docs[index].get('fileName')}',
                                             style: TextStyle(
                                               color: Colors.white,
                                             ),
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                          Text(
-                                            '${snapshot.data!.docs[index].get('fileSize')}',
-                                            style: TextStyle(
-                                              color: Colors.white,
+                                        ),
+                                        Text(
+                                          '${snapshot.data!.docs[index].get('fileSize')}',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: Text(
+                                              "Delete file '${snapshot.data!.docs[index].get('fileName')}'",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  IconButton(
-                                    onPressed: () {
-                                      showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return AlertDialog(
-                                              title: Text(
-                                                "Delete file '${snapshot.data!.docs[index].get('fileName')}'",
-                                                style: TextStyle(
-                                                  color: Colors.white,
+                                            content: Text(
+                                              'Are you sure you want to delete file ${snapshot.data!.docs[index].get('fileName')}?',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            backgroundColor: Colors.grey[800],
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text(
+                                                  'Cancle',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                  ),
                                                 ),
                                               ),
-                                              content: Text(
-                                                'Are you sure you want to delete file ${snapshot.data!.docs[index].get('fileName')}?',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 14,
+                                              Container(
+                                                width: 100,
+                                                height: 40,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.red,
+                                                  borderRadius: BorderRadius.circular(10),
                                                 ),
-                                              ),
-                                              backgroundColor: Colors.grey[800],
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () {
-                                                    Navigator.pop(context);
+                                                child: TextButton(
+                                                  onPressed: () async {
+                                                    deleteFile(snapshot.data!.docs[index].get('fid'));
                                                   },
                                                   child: Text(
-                                                    'Cancle',
+                                                    'Confirm',
                                                     style: TextStyle(
                                                       color: Colors.white,
                                                     ),
                                                   ),
                                                 ),
-                                                Container(
-                                                  width: 100,
-                                                  height: 40,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.red,
-                                                    borderRadius: BorderRadius.circular(10),
-                                                  ),
-                                                  child: TextButton(
-                                                    onPressed: () async {
-                                                      deleteFile(snapshot.data!.docs[index].get('fid'));
-                                                    },
-                                                    child: Text(
-                                                      'Confirm',
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                )
-                                              ],
-                                            );
-                                          });
-                                    },
-                                    icon: Icon(
-                                      Icons.delete,
-                                      color: Colors.red,
-                                    ),
-                                  )
-                                ],
-                              ),
+                                              )
+                                            ],
+                                          );
+                                        });
+                                  },
+                                  icon: Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ),
+                                )
+                              ],
                             ),
-                          )
-                        ],
-                      );
-                    },
-                  );
+                          ),
+                        )
+                      ],
+                    );
+                  },
+                );
               },
             ),
           ),

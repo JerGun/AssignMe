@@ -55,6 +55,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
   }
 
+  Future leaveGroup(String gid) async {
+    DocumentReference groupDoc = FirebaseFirestore.instance.collection('groups').doc(gid);
+    groupDoc.update({
+      'members': FieldValue.arrayRemove([user!.uid])
+    });
+  }
+
   Future deleteGroup(String gid) async {
     FirebaseFirestore.instance.collection('groups').doc(gid).delete();
     CollectionReference collection = FirebaseFirestore.instance.collection('channels');
@@ -112,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               builder: (context, snapshot) {
                                 if (!snapshot.hasData) {
                                   return Center(
-                                    child: CircularProgressIndicator(),
+                                    child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.yellow)),
                                   );
                                 } else {
                                   return FutureBuilder<DocumentSnapshot>(
@@ -123,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           itemBuilder: (context, index) {
                                             if (!userSnapshot.hasData) {
                                               return Center(
-                                                child: CircularProgressIndicator(),
+                                                child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.yellow)),
                                               );
                                             }
                                             Map<String, dynamic> user = userSnapshot.data!.data() as Map<String, dynamic>;
@@ -221,7 +228,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Expanded(
+                                            Container(
                                               child: Text(
                                                 groupName,
                                                 overflow: TextOverflow.ellipsis,
@@ -409,7 +416,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                                                             ),
                                                                                             child: TextButton(
                                                                                               onPressed: () async {
-                                                                                                deleteGroup(gid);
+                                                                                                leaveGroup(gid);
                                                                                               },
                                                                                               child: Text(
                                                                                                 'Confirm',
@@ -453,7 +460,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           builder: (context, snapshot) {
                                             if (!snapshot.hasData) {
                                               return Center(
-                                                child: CircularProgressIndicator(),
+                                                child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.yellow)),
                                               );
                                             } else {
                                               return ListView.builder(
@@ -461,6 +468,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                 itemBuilder: (context, index) {
                                                   return index == 0
                                                       ? ChannelOptionButton(
+                                                        userRole: userRole,
                                                           gid: gid,
                                                           groupName: groupName,
                                                         )
@@ -834,9 +842,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
-                  Home(
-                    userRole: userRole,
-                  )
+                  Home()
                 ],
               ),
             ),

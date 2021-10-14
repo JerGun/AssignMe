@@ -51,7 +51,7 @@ class _MembersScreenState extends State<MembersScreen> {
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return Center(
-                    child: CircularProgressIndicator(),
+                    child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.yellow)),
                   );
                 } else {
                   if (snapshot.data!.docs.length != 0) members = snapshot.data!.docs[0].get('members');
@@ -90,7 +90,7 @@ class _MembersScreenState extends State<MembersScreen> {
                                     builder: (context, userSnapshot) {
                                       if (!userSnapshot.hasData) {
                                         return Center(
-                                          child: CircularProgressIndicator(),
+                                          child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.yellow)),
                                         );
                                       } else {
                                         Map<String, dynamic> data = userSnapshot.data!.data() as Map<String, dynamic>;

@@ -122,7 +122,7 @@ class _JoinGroupScreenState extends State<JoinGroupScreen> {
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
                           return Center(
-                            child: CircularProgressIndicator(),
+                            child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.yellow)),
                           );
                         }
                         return ListView.builder(

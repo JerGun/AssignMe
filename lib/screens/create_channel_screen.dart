@@ -68,7 +68,10 @@ class _CreateChannelScreenState extends State<CreateChannelScreen> {
                 onPressed: () {
                   createChannel();
                 },
-                icon: Icon(Icons.check)),
+                icon: Icon(
+                  Icons.check,
+                  color: Colors.green,
+                )),
           ],
         ),
         body: Container(

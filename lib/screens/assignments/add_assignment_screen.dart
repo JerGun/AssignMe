@@ -38,7 +38,7 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
   TimeOfDay selectedTime = TimeOfDay(hour: 00, minute: 00);
   User? user = FirebaseAuth.instance.currentUser;
 
-  Future addAssignments() async {
+  Future addAssignment() async {
     if (titleController.text.isEmpty)
       fToast.showToast(
         child: toast('Title is required.'),
@@ -100,7 +100,7 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            'Add Assignments',
+            'Add Assignment',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
@@ -110,7 +110,7 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            addAssignments();
+            addAssignment();
           },
           child: Icon(
             Icons.save,

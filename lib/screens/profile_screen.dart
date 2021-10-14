@@ -23,7 +23,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Center(
-            child: CircularProgressIndicator(),
+            child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.yellow)),
           );
         }
         Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
@@ -127,6 +127,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             MaterialPageRoute(
                                 builder: (context) => EditProfileScreen(
                                       img: data['img'],
+                                      firstName: data['firstName'],
+                                      lastName: data['lastName'],
                                     )));
                       },
                       child: Padding(
