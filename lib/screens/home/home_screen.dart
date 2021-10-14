@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_assignme/screens/assignments/add_assignment_screen.dart';
+import 'package:flutter_assignme/screens/attach_file_screen.dart';
 import 'package:flutter_assignme/screens/groups/join_group_screen.dart';
 import 'package:flutter_assignme/screens/home/components/home.dart';
 import 'package:flutter_assignme/screens/components/settings_option.dart';
@@ -53,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
   }
 
-  Future deleteGroup() async {
+  Future deleteGroup(String gid) async {
     FirebaseFirestore.instance.collection('groups').doc(gid).delete();
     CollectionReference collection = FirebaseFirestore.instance.collection('channels');
     await collection
@@ -68,6 +69,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       groupName = 'Notifications';
       groupSelectedIndex = 0;
     });
+  }
+
+  Future deleteChannel(String cid) async {
+    FirebaseFirestore.instance.collection('channels').doc(cid).delete().then((value) => {Navigator.pop(context), Navigator.pop(context)});
   }
 
   @override
@@ -336,7 +341,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                                                             ),
                                                                                             child: TextButton(
                                                                                               onPressed: () async {
-                                                                                                deleteGroup();
+                                                                                                deleteGroup(gid);
                                                                                               },
                                                                                               child: Text(
                                                                                                 'Confirm',
@@ -400,7 +405,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                                                             ),
                                                                                             child: TextButton(
                                                                                               onPressed: () async {
-                                                                                                deleteGroup();
+                                                                                                deleteGroup(gid);
                                                                                               },
                                                                                               child: Text(
                                                                                                 'Confirm',
@@ -472,6 +477,209 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                                 selectedGroupID = snapshot.data!.docs[index - 1].get('gid');
                                                                 isLeftCollapsed = !isLeftCollapsed;
                                                               });
+                                                            },
+                                                            onLongPress: () {
+                                                              showModalBottomSheet(
+                                                                context: context,
+                                                                builder: (BuildContext context) {
+                                                                  return Container(
+                                                                    width: MediaQuery.of(context).size.width,
+                                                                    color: Colors.grey[850],
+                                                                    child: Column(
+                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                      children: [
+                                                                        Container(
+                                                                          margin: EdgeInsets.only(top: 40, left: 20, right: 20),
+                                                                          child: Column(
+                                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                                            children: [
+                                                                              CircleAvatar(
+                                                                                radius: 40,
+                                                                                backgroundColor: img != '' ? Colors.transparent : Colors.yellow,
+                                                                                backgroundImage: NetworkImage(img),
+                                                                                child: img != ''
+                                                                                    ? Container()
+                                                                                    : Text(
+                                                                                        snapshot.data!.docs[index - 1].get('channelName').substring(0, 2).toUpperCase(),
+                                                                                        style: TextStyle(
+                                                                                          color: Colors.black,
+                                                                                          fontSize: 18,
+                                                                                          fontWeight: FontWeight.bold,
+                                                                                        ),
+                                                                                      ),
+                                                                              ),
+                                                                              SizedBox(height: 20),
+                                                                              Text(
+                                                                                snapshot.data!.docs[index - 1].get('channelName'),
+                                                                                style: TextStyle(
+                                                                                  fontSize: 20,
+                                                                                  fontWeight: FontWeight.bold,
+                                                                                  color: Colors.white,
+                                                                                ),
+                                                                              ),
+                                                                              SizedBox(height: 10),
+                                                                              Text(
+                                                                                '${numberMembers.toString()} Members',
+                                                                                style: TextStyle(
+                                                                                  color: Colors.grey,
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                        Padding(
+                                                                          padding: EdgeInsets.all(20),
+                                                                          child: Column(
+                                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                                            children: [
+                                                                              Container(
+                                                                                  width: MediaQuery.of(context).size.width,
+                                                                                  decoration: BoxDecoration(
+                                                                                    color: Colors.grey[800],
+                                                                                    borderRadius: BorderRadius.circular(10),
+                                                                                  ),
+                                                                                  child: owner == user!.uid
+                                                                                      ? Column(
+                                                                                          children: [
+                                                                                            SettingsOption(
+                                                                                              title: 'Channel Settings',
+                                                                                              icon: Icons.settings,
+                                                                                              onPressed: () {},
+                                                                                            ),
+                                                                                            SettingsOption(
+                                                                                              title: 'Delete Channel',
+                                                                                              icon: Icons.close,
+                                                                                              color: Colors.red,
+                                                                                              onPressed: () {
+                                                                                                showDialog(
+                                                                                                  context: context,
+                                                                                                  builder: (context) {
+                                                                                                    return AlertDialog(
+                                                                                                      title: Text(
+                                                                                                        "Delete '${snapshot.data!.docs[index - 1].get('channelName')}'",
+                                                                                                        style: TextStyle(
+                                                                                                          color: Colors.white,
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                      content: Text(
+                                                                                                        'Are you sure you want to delete ${snapshot.data!.docs[index - 1].get('channelName')}? \nThis action cannot be undone.',
+                                                                                                        style: TextStyle(
+                                                                                                          color: Colors.white,
+                                                                                                          fontSize: 14,
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                      backgroundColor: Colors.grey[800],
+                                                                                                      actions: [
+                                                                                                        TextButton(
+                                                                                                          onPressed: () {
+                                                                                                            Navigator.pop(context);
+                                                                                                          },
+                                                                                                          child: Text(
+                                                                                                            'Cancle',
+                                                                                                            style: TextStyle(
+                                                                                                              color: Colors.white,
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                        Container(
+                                                                                                          width: 100,
+                                                                                                          height: 40,
+                                                                                                          decoration: BoxDecoration(
+                                                                                                            color: Colors.red,
+                                                                                                            borderRadius: BorderRadius.circular(10),
+                                                                                                          ),
+                                                                                                          child: TextButton(
+                                                                                                            onPressed: () async {
+                                                                                                              deleteChannel(snapshot.data!.docs[index - 1].get('cid'));
+                                                                                                            },
+                                                                                                            child: Text(
+                                                                                                              'Confirm',
+                                                                                                              style: TextStyle(
+                                                                                                                color: Colors.white,
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                        )
+                                                                                                      ],
+                                                                                                    );
+                                                                                                  },
+                                                                                                );
+                                                                                              },
+                                                                                            ),
+                                                                                          ],
+                                                                                        )
+                                                                                      : Column(
+                                                                                          children: [
+                                                                                            SettingsOption(
+                                                                                              title: 'Leave Channel',
+                                                                                              icon: Icons.exit_to_app,
+                                                                                              color: Colors.red,
+                                                                                              onPressed: () {
+                                                                                                showDialog(
+                                                                                                  context: context,
+                                                                                                  builder: (context) {
+                                                                                                    return AlertDialog(
+                                                                                                      title: Text(
+                                                                                                        "Leave '${snapshot.data!.docs[index - 1].get('channelName')}'",
+                                                                                                        style: TextStyle(
+                                                                                                          color: Colors.white,
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                      content: Text(
+                                                                                                        'Are you sure you want to leave ${snapshot.data!.docs[index - 1].get('channelName')}?.',
+                                                                                                        style: TextStyle(
+                                                                                                          color: Colors.white,
+                                                                                                          fontSize: 14,
+                                                                                                        ),
+                                                                                                      ),
+                                                                                                      backgroundColor: Colors.grey[800],
+                                                                                                      actions: [
+                                                                                                        TextButton(
+                                                                                                          onPressed: () {
+                                                                                                            Navigator.pop(context);
+                                                                                                          },
+                                                                                                          child: Text(
+                                                                                                            'Cancle',
+                                                                                                            style: TextStyle(
+                                                                                                              color: Colors.white,
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                        Container(
+                                                                                                          width: 100,
+                                                                                                          height: 40,
+                                                                                                          decoration: BoxDecoration(
+                                                                                                            color: Colors.red,
+                                                                                                            borderRadius: BorderRadius.circular(10),
+                                                                                                          ),
+                                                                                                          child: TextButton(
+                                                                                                            onPressed: () async {
+                                                                                                              deleteChannel(snapshot.data!.docs[index - 1].get('cid'));
+                                                                                                            },
+                                                                                                            child: Text(
+                                                                                                              'Confirm',
+                                                                                                              style: TextStyle(
+                                                                                                                color: Colors.white,
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                        )
+                                                                                                      ],
+                                                                                                    );
+                                                                                                  },
+                                                                                                );
+                                                                                              },
+                                                                                            ),
+                                                                                          ],
+                                                                                        ))
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  );
+                                                                },
+                                                              );
                                                             },
                                                             child: Align(
                                                               alignment: Alignment.centerLeft,
@@ -565,7 +773,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           ),
                           if (groupName != 'Notifications')
                             IconButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => AttachFileScreen()));
+                              },
                               icon: Icon(Icons.attach_file, color: Colors.white),
                             ),
                           if (groupName != 'Notifications')
